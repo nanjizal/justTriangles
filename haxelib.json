@@ -1,0 +1,16 @@
+
+{
+	"name": "justTriangles",
+	"license": "MIT",
+	"tags": ["cross","js"],
+	"description": "justTriangles - vector shape generation with triangles helper library",
+	"contributors": [
+    "Nanjizal"
+  ],
+	"releasenote": "See https://github.com/nanjizal/justTriangles/blob/master/readme.md",
+	"version": "0.0.1",
+	"url": "https://github.com/nanjizal/justTriangles",
+	"classPath": "/",
+	"dependencies": {
+  }
+}
