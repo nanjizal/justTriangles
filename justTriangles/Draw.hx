@@ -186,7 +186,7 @@ class Draw {
         c = Math.sqrt( c2 );
         a = Math.sqrt( a2 );
         cosA = ( b2 + c2 - a2 )/ ( 2*b*c );
-        // clamp cosA between +- 1
+        // clamp cosA between ±1
         if( cosA > 1 ) {
             cosA = 1;
         } else if( cosA < -1 ){
