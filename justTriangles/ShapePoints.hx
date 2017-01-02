@@ -1,5 +1,6 @@
 package justTriangles;
 import justTriangles.Point;
+import justTriangles.Bezier;
 class ShapePoints {
     // Create Rectangular Box Points
     public static inline function box( x: Float,y: Float, wid: Float, hi: Float ): Array<Point>{
@@ -95,23 +96,43 @@ class ShapePoints {
     public static inline function quadCurve( p0, p1, p2 ): Array<Point> {
         var p: Array<Point> = new Array<Point>(); 
         var approxDistance = distance( p0, p1 ) + distance( p1, p2 );
-        var factor = 2;
         var v: { x: Float, y: Float };
         if( approxDistance == 0 ) approxDistance = 0.000001;
         var step = Math.min( 1/( approxDistance*0.707 ), quadStep );
         var arr = [ p0, p1, p2 ];
         var t = 0.0;
-        v = quadraticBezier( 0.0, arr );
+        v = Bezier.quadratic( 0.0, arr );
         p.push( { x: v.x, y: v.y } );
         t += step;
         while( t < 1 ){
-            v = quadraticBezier( t, arr );
+            v = Bezier.quadratic( t, arr );
             p.push( { x: v.x, y: v.y } );
             t += step;
         }
-        v = quadraticBezier( 1.0, arr );
+        v = Bezier.quadratic( 1.0, arr );
         p.push( { x: v.x, y: v.y } );
-        //p.reverse();
+        return p;
+    }
+    public static var cubicStep: Float = 0.03;
+    // Create Cubic Curve
+    public static inline function cubicCurve( p0, p1, p2, p3 ): Array<Point> {
+        var p: Array<Point> = new Array<Point>(); 
+        var approxDistance = distance( p0, p1 ) + distance( p1, p2 ) + distance( p2, p3 );
+        var v: { x: Float, y: Float };
+        if( approxDistance == 0 ) approxDistance = 0.000001;
+        var step = Math.min( 1/( approxDistance*0.707 ), cubicStep );
+        var arr = [ p0, p1, p2, p3 ];
+        var t = 0.0;
+        v = Bezier.cubic( 0.0, arr );
+        p.push( { x: v.x, y: v.y } );
+        t += step;
+        while( t < 1 ){
+            v = Bezier.cubic( t, arr );
+            p.push( { x: v.x, y: v.y } );
+            t += step;
+        }
+        v = Bezier.cubic( 1.0, arr );
+        p.push( { x: v.x, y: v.y } );
         return p;
     }
     public static inline function distance(     p0: { x: Float, y: Float }
