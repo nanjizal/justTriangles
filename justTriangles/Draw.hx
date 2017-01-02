@@ -166,7 +166,7 @@ class Draw {
         var curveLen: Int;
         var len = p.length - 1;
         for( i in 0...len ){
-            if( ( i - 2 ) % 2 == 0 ){
+            if( ( i - 2 ) % 3 == 0 ){
                 curvePoints = ShapePoints.cubicCurve( p[ i], p[ i + 1 ], p[ i + 2 ], p[ i + 3 ] );
                 curveLen = curvePoints.length;
                 Draw.beginLine( id, curvePoints[ 0 ], curvePoints[ 1 ], thick );
