@@ -147,7 +147,34 @@ class Draw {
         drawTri( id, true, q0, q3, q4, colorLine_id );
         return draw;
     }
-    
+    public static inline function quadCurves( id: Int, p: Array<Point>, thick: Float ){
+        var curvePoints:Array<Point>;
+        var curveLen: Int;
+        var len = p.length - 1;
+        for( i in 0...len ){
+            if( ( i - 1 ) % 2 == 0 ){
+                curvePoints = ShapePoints.quadCurve( p[ i], p[ i + 1 ], p[ i + 2 ] );
+                curveLen = curvePoints.length;
+                Draw.beginLine( id, curvePoints[ 0 ], curvePoints[ 1 ], thick );
+                Draw.endLine( id, curvePoints[ curveLen - 2 ], curvePoints[ curveLen - 1 ], thick );
+                Draw.triangles( id, true, curvePoints );
+            }
+        }
+    }
+    public static inline function cubicCurves( id: Int, p: Array<Point>, thick: Float ){
+        var curvePoints:Array<Point>;
+        var curveLen: Int;
+        var len = p.length - 1;
+        for( i in 0...len ){
+            if( ( i - 2 ) % 2 == 0 ){
+                curvePoints = ShapePoints.cubicCurve( p[ i], p[ i + 1 ], p[ i + 2 ], p[ i + 3 ] );
+                curveLen = curvePoints.length;
+                Draw.beginLine( id, curvePoints[ 0 ], curvePoints[ 1 ], thick );
+                Draw.endLine( id, curvePoints[ curveLen - 3 ], curvePoints[ curveLen - 2 ], thick );
+                Draw.triangles( id, true, curvePoints );
+            }
+        }
+    }    
     public function create2Lines( p0_: Point, p1_: Point, p2_: Point, thick: Float ){
         p0 = p0_;
         p1 = p1_;
