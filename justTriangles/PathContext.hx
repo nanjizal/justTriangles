@@ -25,14 +25,16 @@ class PathContext {
     public function quadTo( x1: Float, y1: Float, x2: Float, y2: Float ): Void {
         var p1: Point = { x: x1, y: y1 };
         var p2: Point = { x: x2, y: y2 };
-        ShapePoints.quadCurve( p0, p1, p2 );
+        var pMore = ShapePoints.quadCurve( p0, p1, p2 );
+        for( p in pMore ) pp.push( p );
         p0 = p2;
     }
     public function curveTo( x1: Float, y1: Float, x2: Float, y2: Float, x3: Float, y3: Float ): Void {
         var p1: Point = { x: x1, y: y1 };
         var p2: Point = { x: x2, y: y2 };
         var p3: Point = { x: x2, y: y3 };
-        ShapePoints.cubicCurve( p0, p1, p2, p3 );
+        var pMore = ShapePoints.cubicCurve( p0, p1, p2, p3 );
+        for( p in pMore ) pp.push( p );        
         p0 = p3;
     }
     public function render( thick: Float, ?outline: Bool = true ){
