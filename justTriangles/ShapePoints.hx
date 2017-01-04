@@ -128,16 +128,18 @@ class ShapePoints {
         var step = Math.min( 1/( approxDistance*0.707 ), cubicStep );
         var arr = [ p0, p1, p2, p3 ];
         var t = 0.0;
-        v = Bezier.cubic( 0.0, arr );
-        p.push( { x: v.x, y: v.y } );
+        /*v = Bezier.cubic( 0.0, arr );
+        p.push( { x: v.x, y: v.y } );*/
+        p.push( p0 );
         t += step;
         while( t < 1 ){
             v = Bezier.cubic( t, arr );
             p.push( { x: v.x, y: v.y } );
             t += step;
         }
-        v = Bezier.cubic( 1.0, arr );
-        p.push( { x: v.x, y: v.y } );
+        /*v = Bezier.cubic( 1.0, arr );
+        p.push( { x: v.x, y: v.y } );*/
+        p.push( p3 );
         return p;
     }
     public static inline function distance(     p0: { x: Float, y: Float }
