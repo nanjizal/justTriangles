@@ -101,16 +101,21 @@ class ShapePoints {
         var step = Math.min( 1/( approxDistance*0.707 ), quadStep );
         var arr = [ p0, p1, p2 ];
         var t = 0.0;
+        /*
         v = Bezier.quadratic( 0.0, arr );
-        p.push( { x: v.x, y: v.y } );
+        p.push( { x: v.x, y: v.y } );*/
+        p.push( p0 );
         t += step;
         while( t < 1 ){
             v = Bezier.quadratic( t, arr );
             p.push( { x: v.x, y: v.y } );
             t += step;
         }
+        /*
         v = Bezier.quadratic( 1.0, arr );
         p.push( { x: v.x, y: v.y } );
+        */
+        p.push( p2 );
         return p;
     }
     public static var cubicStep: Float = 0.03;
