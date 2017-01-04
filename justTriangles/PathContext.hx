@@ -44,10 +44,8 @@ class PathContext {
         }
     }
     public function clear(){
-        for( pp0 in ppp ){
-            pp0.length = 0;
-        }
-        ppp.length = 0;
+        ppp = null;
+        pp = null;
         p0 = null;
     }
 }
