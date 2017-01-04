@@ -4,7 +4,7 @@ import justTriangles.Point;
 import justTriangles.ShapePoints;
 class PathContext {
     var p0: Point;
-    var pp: Array;
+    var pp: Array<Point>;
     var ppp: Array<Array<Point>>;
     public var id: Int;
     public function new( id_: Int ){
