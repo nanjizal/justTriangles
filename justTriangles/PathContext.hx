@@ -5,10 +5,11 @@ import justTriangles.ShapePoints;
 class PathContext {
     var p0: Point;
     var pp: Array;
-    var ppp: Array = Array<Array<Point>>();
+    var ppp: Array<Array<Point>>;
     public var id: Int;
     public function new( id_: Int ){
         id = id_;
+        ppp = new Array<Array<Point>>();
         moveTo( 0, 0 );
     }
     public function moveTo( x: Float, y: Float ): Void {
