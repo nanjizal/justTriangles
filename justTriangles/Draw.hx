@@ -313,7 +313,7 @@ class Draw {
         var q4 = draw.p4;
         if( i != 0 ){
             drawTri( id, outline, q0, q3, q1, colorFill_id );
-            drawTri( id, outline, q1, q3, q4, colorFill_id );
+            drawTri( id, outline, q1, q3, q4, extraFill_id );
         }
         q0 = q3;
         q1 = q4;
