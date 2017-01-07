@@ -3,6 +3,7 @@ import justTriangles.Draw;
 import justTriangles.Point;
 import justTriangles.ShapePoints;
 class PathContext {
+    var dirty: Bool = true;
     var p0: Point;
     var pp: Array<Point>;
     var ppp: Array<Array<Point>>;
@@ -26,7 +27,9 @@ class PathContext {
         return { x: s*( x - dw + tx ), y: s*( y - dw + ty ) }
     }
     public function moveTo( x: Float, y: Float ): Void {
+        dirty = true;
         p0 = pt( x, y );
+        if( pp != null ) if( pp.length == 1 ) ppp.pop(); // remove moveTo that don't have another drawing command after.
         pp = new Array();
         pp.push( p0 );
         ppp.push( pp );
@@ -54,25 +57,28 @@ class PathContext {
         p0 = p3;
     }
     public function render( thick: Float, ?outline: Bool = true ){
-        reverseEntries();
+        if( dirty ) reverseEntries();
         for( pp0 in ppp_ ){
             Draw.poly( id, outline, pp0 );
         }
     }
     inline function reverseEntries(){
         var p: Array<Point>;
-        if( ppp_ == null ){
-            ppp_ = new Array<Array<Point>>();
-            for( pp0 in ppp ){
-                if( pp0.length > 1 ) {
-                    p = pp0.copy(); // not sure why not allowed to do all this in one line?
-                    p.reverse();
-                    ppp_.push( p );
-                }
-            }
+        if( ppp_ == null ) ppp_ = new Array<Array<Point>>();
+        var plen = ppp.length;
+        var plen_ = ppp_.length;
+        var pp0: Array<Point>;
+        for( i in plen_...plen ){
+            // only add ones new ones
+            pp0 = ppp[ i ];
+            p = pp0.copy(); // not sure why not allowed to do all this in one line?
+            p.reverse();
+            ppp_[ i ] = p;
         }
+        dirty = false;
     }
     public function clear(){
+        dirty = true;
         ppp_ = null;
         ppp = null;
         pp = null;
