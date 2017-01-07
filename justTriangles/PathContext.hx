@@ -45,8 +45,8 @@ class PathContext {
         }
     }
     inline function reverseEntries(){
-        var p: Array<Point>;
         if( ppp_ == null ){
+            var p: Array<Point>;            
             ppp_ = new Array<Array<Point>>();
             for( pp0 in ppp ){
                 if( pp0.length > 1 ) {
