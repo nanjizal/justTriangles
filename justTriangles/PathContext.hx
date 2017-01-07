@@ -39,8 +39,22 @@ class PathContext {
         p0 = p3;
     }
     public function render( thick: Float, ?outline: Bool = true ){
-        for( pp0 in ppp ){
-            Draw.triangles( id, outline, pp0 );
+        reverseEntries();
+        for( pp0 in ppp_ ){
+            Draw.poly( id, outline, pp0 );
+        }
+    }
+    inline function reverseEntries(){
+        var p: Array<Point>;
+        if( ppp_ == null ){
+            ppp_ = new Array<Array<Point>>();
+            for( pp0 in ppp ){
+                if( pp0.length > 1 ) {
+                    p = pp0.copy(); // not sure why not allowed to do all this in one line?
+                    p.reverse();
+                    ppp_.push( p );
+                }
+            }
         }
     }
     public function clear(){
