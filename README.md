@@ -4,6 +4,15 @@ Vector shape generation with triangles helper library
 Example WebGL use please see:
 https://github.com/nanjizal/justTrianglesDemo
 
-added support for cubic curves, but not yet tested use, but quadratic curves are pretty easy to use as you can see here:
+new PathContext much improved for drawing outlines.
+- MoveTo and LineTo supported
+- Cubic and Quadratic Curves supported
+- Regular Polygons
 
-https://gist.github.com/nanjizal/55f1bcb29b85ef11aba0133f7c9c9dd1
+TODO:
+- Rounded Rectangles and Arcs for PathContext in progress
+- fix occasional edge cases for thickness trig related perhaps actually js error.
+- improve stability
+- add fill to PathContext.
+- add isolated lines round edge to general PathContext?
+- Explore further combinations of mixing with fill libraries.
