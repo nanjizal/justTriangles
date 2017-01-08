@@ -23,7 +23,18 @@ class Draw {
     public var _theta: Float;
     public var angle1: Float;
     var angle2: Float;
+    public var thickRatio: Float = 1024;
     var _thick: Float;
+    public static var thickness: Float;
+    public static var thick( get, set ): Float;
+    public static function set_thick( val: Float ):Float{
+        if( val < 0 ) val = 0.00001; // TODO: check if this is reasonable lower limit.
+        thickness = val/1024;
+        return thickness;
+    }
+    public static function get_thick(): Float {
+        return thickness;
+    }
     public static var colorFill_id: Int;
     public static var colorLine_id: Int;
     public static var extraFill_id: Int;
@@ -50,28 +61,7 @@ class Draw {
         Draw.outerPoly( id, true, { x: dx + wid, y: dy }, rt );// right top
         Draw.outerPoly( id, true, { x: dx, y: dy }, lt );// left top
     }
-    public static function equilateralTriangleOutline( id: Int, dx: Float, dy: Float, radius: Float, ?rotation: Float = 0 ):Void {
-        Draw.poly( id, true, ShapePoints.equalTri( dx, dy, radius, rotation ) );
-    }
-    public static function rectangleOutline( id: Int, dx: Float, dy: Float, dw: Float, dh: Float): Void {
-        Draw.poly( id, true, ShapePoints.box( dx, dy, dw, dh ) );
-    }
-    public static function pentagonOutline( id: Int, dx: Float, dy: Float, radius: Float ):Void {
-        Draw.poly( id, true, ShapePoints.poly( dx, dy, radius, 5 ) );
-    }
-    public static function hexagonOutline( id: Int, dx: Float, dy: Float, radius: Float ):Void {
-        Draw.poly( id, true, ShapePoints.poly( dx, dy, radius, 6 ) );
-    }
-    public static inline function heptagonOutline( id: Int, dx: Float, dy: Float, radius: Float ):Void {
-        Draw.poly( id, true, ShapePoints.poly( dx, dy, radius, 7 ) );
-    }
-    public static function octagonOutline( id: Int, dx: Float, dy: Float, radius: Float ):Void {
-        Draw.poly( id, true, ShapePoints.poly( dx, dy, radius, 8 ) );
-    }    
-    public static function circleOutline( id: Int, dx: Float, dy: Float, radius: Float ):Void {
-        Draw.poly( id, true, ShapePoints.poly( dx, dy, radius, circleSides ) );
-    }
-    public static inline function beginLine( id: Int, p0_: Point, p1_: Point, thick: Float ){
+    public static inline function beginLine( id: Int, p0_: Point, p1_: Point, ?thick: Float ){
         var draw = new Draw();
         draw.p0 = p1_;
         draw.p1 = p0_;
@@ -202,7 +192,8 @@ class Draw {
         _thick = val;
         beta = Math.PI/2 - halfA;
         //if( cosA == -1  ) 
-        r = ( _thick/2 );///Math.cos( beta );
+        //r = ( _thick/2 );Math.cos( beta )
+        r = ( _thick/2 )*Math.cos( beta );
         //trace( ' r ' + r );
     }
     public inline function calculateP3p4(){
@@ -243,7 +234,7 @@ class Draw {
         var dy: Float = p0.y - p1.y;
         return dx*dx + dy*dy; 
     }
-    public static var thickness: Float;
+    
     private static var q0: Point;
     private static var q1: Point;
     public static var colors: Array<UInt>;
