@@ -14,7 +14,7 @@ https://github.com/nanjizal/justTrianglesDemo/blob/master/justTrianglesDemo/Demo
 
 TODO:
 - Rounded Rectangles have issue with joining ( wider issue ), but work.
-- fix occasional edge cases for thickness trig related perhaps actually js error.
+- fix occasional edge cases for thickness trig related perhaps actually js error in trig.
 - improve stability
 - add fill to PathContext.
 - add isolated lines round edge to general PathContext so that sharp angle can look better.
