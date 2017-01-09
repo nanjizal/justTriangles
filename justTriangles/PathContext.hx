@@ -3,6 +3,11 @@ import justTriangles.Draw;
 import justTriangles.Point;
 import justTriangles.ShapePoints;
 @:enum
+abstract DrawDirection( Bool ){
+    var clockwise = true;
+    var counterClockwise = false;
+}
+@:enum
 abstract PolySides( Int ) {
     var triangle        = 3;
     var quadrilateral   = 4;
@@ -106,45 +111,63 @@ class PathContext {
         moveToPoint( pMore[0] );
         for( p in pMore  ) pp.push( p );
     }
-    // probably not yet working.
-    public function arc( x: Float, y: Float, radius: Float, start: Float, dA: Float, sides: Int ):Void{
+    // working.
+    public function arc_move( x: Float, y: Float, radius: Float, start: Float, dA: Float, ?direction: DrawDirection, ?sides: PolySides ):Void{
+        if( direction == null ) direction = clockwise;
+        if( sides == null ) sides = circleSides;
         var p1: Point = pt( x, y );
-        var pMore = ShapePoints.arcPoints( p1, radius*s, start, dA, sides );
+        if( direction == counterClockwise ) dA = -dA; //TODO: Check
+        var pMore = ShapePoints.arcPoints( p1, radius*s, start, dA, cast sides );
         moveToPoint( pMore[0] );
         for( p in pMore  ) pp.push( p );
     }
-    // not yet working 
-    public function roundedRectangle( dx: Float, dy: Float, width: Float, height: Float, radiusSmall: Float, radius: Float ): Void {
-        var dia = radius*2; // radiusSmall = 10 radius = 25
-        var circleSides2 = (cast circleSides )*2;
-        width = width*s;
-        height = height*s;
-        radiusSmall = radiusSmall*s;
-        radius = radius*s;
-        var p1 = pt( dx, dy - radius );
-        var p2 = pt( dx + width, dy - radius );
-        var p3 = pt( dx + radius + width, dy );
-        var p4 = pt( dx + radius + width, dy + height );
-        var p5 = pt( dx, dy + radius + height );
-        var p6 = pt( dx + width, dy + radius + height );
-        var p7 = pt( dx - radius, dy );
-        var p8 = pt( dx - radius, dy + height );
-        moveToPoint( p1 );
-        pp.push( p2 );
-        p0 = p2;
-        arc( dx + width , dy, radiusSmall, -Math.PI/2, Math.PI/2, circleSides2 ); // right top
-        moveToPoint( p3 );
-        pp.push( p4 );
-        p0 = p4;
-        arc( dx + width, dy + height, radiusSmall, 0, Math.PI/2, circleSides2 ); // right bottom
-        moveToPoint( p6 );
-        pp.push( p5 );
-        p0 = p5;
-        arc( dx, dy + height, radiusSmall, -Math.PI - Math.PI/2, Math.PI/2, circleSides2 ); // left bottom
-        moveToPoint( p8 );
-        pp.push( p7 );
-        p0 = p7;
-        arc( dx, dy, radiusSmall, -Math.PI, Math.PI/2, circleSides2 ); // top left
+    // working.
+    public function arc( x: Float, y: Float, radius: Float, start: Float, dA: Float, ?direction: DrawDirection, ?sides: PolySides ):Void{
+        if( direction == null ) direction = clockwise;
+        if( sides == null ) sides = circleSides;
+        var p1: Point = pt( x, y );
+        if( direction == counterClockwise ) dA = -dA; //TODO: Check
+        var pMore = ShapePoints.arcPoints( p1, radius*s, start, dA, cast sides );
+        for( p in pMore  ) pp.push( p );
+    }
+    // TODO: issue with closing rounded rectangle and some polys with the last line - webgl specific?
+    public function roundedRectangle( dx: Float, dy: Float, width: Float, height: Float, radius: Float ): Void {
+        var pi = Math.PI;
+        var pi_2 = Math.PI/2;
+        var p_arc1x = dx + radius;  // TODO: excessive reduce temp var
+        var p_arc1y = dy + radius;
+        var p_arc2x = dx + width - radius;
+        var p_arc2y = dy + radius;
+        var p_arc3x = dx + width - radius;
+        var p_arc3y = dy + height - radius;
+        var p_arc4x = dx + radius;
+        var p_arc4y = dy + height - radius;
+        var p1x = dx + radius;
+        var p1y = dy;
+        var p2x = dx + width - radius;
+        var p2y = dy;
+        var p3x = dx + width;
+        var p3y = dy + radius;
+        var p4x = dx + width;
+        var p4y = dy + height - radius;
+        var p5x = dx + width - radius;
+        var p5y = dy + height;
+        var p6x = dx + radius;
+        var p6y = dy + height;
+        var p7x = dx;
+        var p7y = dy + height - radius;
+        var p8x = dx;
+        var p8y = dy + radius;
+        moveTo( p8x, p8y );
+        arc_move( p_arc1x, p_arc1y, radius,    pi, pi_2, clockwise, hexacontagon );
+        lineTo( p2x, p2y );
+        arc( p_arc2x, p_arc2y, radius, -pi_2, pi_2, clockwise, hexacontagon );
+        lineTo( p4x, p4y );
+        arc( p_arc3x, p_arc3y, radius,     0, pi_2, clockwise, hexacontagon );
+        lineTo( p6x, p6y );
+        arc( p_arc4x, p_arc4y, radius,  pi_2, pi_2,   clockwise, hexacontagon );
+        lineTo( p8x + 0.0001, p8y + 0.0001 );// TODO: this needs fixing?
+        lineTo( p8x, p8y );
     }
     // currently only use predefined sides to encourage use of PolySides names.
     public function regularPoly( sides: PolySides, x: Float, y: Float, radius: Float, ?rotation: Float = 0 ): Void {
