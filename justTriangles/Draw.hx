@@ -297,7 +297,7 @@ class Draw {
         q1 = q4;
         return draw;
     }
-    private static inline function quad( id: Int, outline: Bool, p: Array<Point>, i: Int ){
+    public static inline function quad( id: Int, outline: Bool, p: Array<Point>, i: Int ){
         var draw = new Draw();
         draw.create2Lines( p[ i ], p[ i + 1 ], p[ i + 2 ], thickness );
         var q3 = draw.p3;
