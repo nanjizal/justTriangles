@@ -26,7 +26,7 @@ class Triangle {
         cx = cx + dx;
         return x;
     }
-    public var y( get, set ): Float;    
+    public var y( get, set ): Float;   
     function get_y(): Float {
         return Math.min( Math.min( ay, by ), cy );
     }
@@ -52,7 +52,7 @@ class Triangle {
         by += dy;
         cx += dx;
         cy += dy;
-    }    
+    }   
     public function new(  id_: Int
                         , outline_: Bool
                         , A_: Point, B_: Point, C_: Point
@@ -61,14 +61,36 @@ class Triangle {
                         ){
         id = id_;
         outline = outline_;
-        ax = A_.x;
-        ay = A_.y;
-        bx = B_.x;
-        by = B_.y;
-        cx = C_.x;
-        cy = C_.y;
+        if( adjustWinding( A_, B_, C_ ) ){
+            ax = A_.x;
+            ay = A_.y;
+            bx = C_.x;
+            by = C_.y;
+            cx = B_.x;
+            cy = B_.y;
+        } else {
+            ax = A_.x;
+            ay = A_.y;
+            bx = B_.x;
+            by = B_.y;
+            cx = C_.x;
+            cy = C_.y;
+        }
         depth = depth_;
         colorID = colorID_;
+    }
+    // A B C, you can find the winding by computing the cross product (B - A) x (C - A)
+    inline static function adjustWinding( A_: Point, B_: Point, C_: Point ): Bool{
+        var val: Bool = !( cross( subtract( B_, A_ ), subtract( C_, A_ ) ) < 0 );
+        return val;
+    }
+    // subtract
+    inline static function subtract( p0:Point, p1:Point ) : Point {
+        return { x: p0.x - p1.x, y: p0.y - p1.y };
+    }
+    // to get the cross product
+    inline static function cross(p0:Point, p1:Point) : Float {
+        return p0.x*p1.y - p0.y*p1.x;
     }
     //http://www.emanueleferonato.com/2012/06/18/algorithm-to-determine-if-a-point-is-inside-a-triangle-with-mathematics-no-hit-test-involved/
     public function hitTest( P: Point ): Bool {
