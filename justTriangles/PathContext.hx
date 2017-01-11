@@ -2,6 +2,12 @@ package justTriangles;
 import justTriangles.Draw;
 import justTriangles.Point;
 import justTriangles.ShapePoints;
+enum LineType {
+    Poly;
+    Round;
+    Isolated;
+    Quad;
+}
 @:enum
 abstract DrawDirection( Bool ){
     var clockwise = true;
@@ -55,6 +61,7 @@ class PathContext {
     var tx: Float;
     var ty: Float;
     public var id: Int;
+    public var lineType: LineType = Round;
     public function new( id_: Int, width_: Float, ?tx_: Float = 0, ?ty_: Float = 0){
         id = id_;
         dw = width_/2;
@@ -166,7 +173,7 @@ class PathContext {
         arc( p_arc3x, p_arc3y, radius,     0, pi_2, clockwise, hexacontagon );
         lineTo( p6x, p6y );
         arc( p_arc4x, p_arc4y, radius,  pi_2, pi_2,   clockwise, hexacontagon );
-        lineTo( p8x + 0.0001, p8y + 0.0001 );// TODO: this needs fixing?
+        //lineTo( p8x + 0.0001, p8y + 0.0001 );// TODO: this needs fixing?
         lineTo( p8x, p8y );
     }
     // currently only use predefined sides to encourage use of PolySides names.
@@ -180,9 +187,26 @@ class PathContext {
         Draw.thick = thick;
         if( dirty ) reverseEntries();
         for( pp0 in ppp_ ){
-            trace( pp0.length );
-            trace( pp0 );
-            Draw.poly( id, outline, pp0 );
+            switch( lineType ){
+                case Poly:
+                    // fairly optimal but broken
+                    Draw.poly( id, outline, pp0 );
+                case Round:
+                    // Pretty perfect but over drawing
+                    for( i in 0...pp0.length ){
+                       if( i%1 == 0 && i< pp0.length - 2) Draw.isolatedLine( id, pp0[ i ], pp0[ i + 1 ], thick/800, true );
+                    }
+                case Isolated:
+                    // similar to poly but more broken
+                    for( i in 0...pp0.length ){
+                       if( i%1 == 0 && i< pp0.length - 2) Draw.isolatedLine( id, pp0[ i ], pp0[ i + 1 ], thick/800, false );
+                    }
+                case Quad:
+                    // very broken
+                    for( i in 0...pp0.length ) {
+                        if( i%1 == 0 && i< pp0.length - 2) Draw.quad( id, outline, pp0, i );
+                    }
+            }
         }
     }
     inline function reverseEntries(){
