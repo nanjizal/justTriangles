@@ -17,7 +17,7 @@ class QuickPaths {
     }
     // TODO: refactor to be more generic?
     // curveTo cubic curve test
-    public static inline function speech( ctx: PathContext ):Void {
+    public static inline function speechBubble( ctx: PathContext ):Void {
         ctx.moveTo(75,40);
         ctx.curveTo(75,37,70,25,50,25);
         ctx.curveTo(20,25,20,62.5,20,62.5);
