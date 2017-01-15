@@ -3,7 +3,9 @@ import justTriangles.Draw;
 import justTriangles.Point;
 import justTriangles.ShapePoints;
 enum LineType {
-    Poly;
+    TriangleJoin; // arc, straight - Default seems to work quite well, but WIP.
+    Poly;         // polygons
+    Curves;       // curves
     Round;
     Isolated;
     Quad;
@@ -61,7 +63,7 @@ class PathContext {
     var tx: Float;
     var ty: Float;
     public var id: Int;
-    public var lineType: LineType = Round;
+    public var lineType: LineType = TriangleJoin;
     public function new( id_: Int, width_: Float, ?tx_: Float = 0, ?ty_: Float = 0){
         id = id_;
         dw = width_/2;
@@ -167,13 +169,9 @@ class PathContext {
         var p8y = dy + radius;
         moveTo( p8x, p8y );
         arc_move( p_arc1x, p_arc1y, radius,    pi, pi_2, clockwise, hexacontagon );
-        lineTo( p2x, p2y );
         arc( p_arc2x, p_arc2y, radius, -pi_2, pi_2, clockwise, hexacontagon );
-        lineTo( p4x, p4y );
         arc( p_arc3x, p_arc3y, radius,     0, pi_2, clockwise, hexacontagon );
-        lineTo( p6x, p6y );
         arc( p_arc4x, p_arc4y, radius,  pi_2, pi_2,   clockwise, hexacontagon );
-        //lineTo( p8x + 0.0001, p8y + 0.0001 );// TODO: this needs fixing?
         lineTo( p8x, p8y );
     }
     // currently only use predefined sides to encourage use of PolySides names.
@@ -188,9 +186,22 @@ class PathContext {
         if( dirty ) reverseEntries();
         for( pp0 in ppp_ ){
             switch( lineType ){
+                // Currently best line drawing enum still under active development.
+                case TriangleJoin:
+                    var draw = new Draw();
+                    for( i in 0...pp0.length ){
+                       if( i%1 == 0 && i< pp0.length - 2) Draw.triangleJoin( id, draw, pp0[ i ], pp0[ i + 1 ], thick/800 );
+                    }
+                // Other alternates still keeping till have developed ideal solution.
                 case Poly:
                     // fairly optimal but broken
                     Draw.poly( id, outline, pp0 );
+                case Curves:
+                    // Not quite working on round rectangle but working well otherwise
+                    //Draw.isolatedSpecial( id, pp0[ 0 ], pp0[ 1 ], thick/800 );
+                    for( i in 0...pp0.length ) {
+                        if( i%1 == 0 && i< pp0.length - 2) Draw.quad( id, outline, pp0, i );
+                    }
                 case Round:
                     // Pretty perfect but over drawing
                     for( i in 0...pp0.length ){
