@@ -2,13 +2,13 @@ package justTriangles;
 import justTriangles.ShapePoints;
 import justTriangles.Point;
 import justTriangles.DrawTri;
-class Draw { 
+class Draw {
     var p0: Point;
     var p1: Point;
     var p2: Point;
     public var p3: Point;
     public var p4: Point;
-    var angleA: Float; // smallest angle between lines
+    public var angleA: Float; // smallest angle between lines
     var cosA: Float;
     var b2: Float;
     var c2: Float;
@@ -37,6 +37,7 @@ class Draw {
     }
     public static var colorFill_id: Int;
     public static var colorLine_id: Int;
+    public static var extraLine_id: Int;
     public static var extraFill_id: Int;
     public static var drawTri: DrawTri;//Int -> Bool -> Point -> Point -> Point -> Int -> Void;
     public function new(){}
@@ -51,7 +52,7 @@ class Draw {
         var rb = ShapePoints.arc( dx + wid, dy + hi, radiusSmall, 0, Math.PI/2, circleSides2 );
         var rt = ShapePoints.arc( dx + wid , dy, radiusSmall, -Math.PI/2, Math.PI/2, circleSides2 );
         var lt = ShapePoints.arc( dx, dy, radiusSmall, -Math.PI, Math.PI/2, circleSides2 );
-        
+       
         Draw.isolatedLine( id, { x: dx, y: dy - radius }, { x: dx + wid, y: dy - radius }, dia, false );
         Draw.isolatedLine( id, { x: dx + radius + wid, y: dy }, { x: dx + radius + wid, y: dy + hi }, dia, false );
         Draw.isolatedLine( id, { x: dx, y: dy + radius + hi }, { x: dx + wid, y: dy + radius + hi }, dia, false );
@@ -119,9 +120,12 @@ class Draw {
         var q0 = { x: draw.p3.x, y: draw.p3.y };
         var q1 = { x: draw.p4.x, y: draw.p4.y };
         //switch lines round to get other side but make sure you finish on p1 so that p3 and p4 are useful
+       
         draw.p0 = p0_;
         draw.p1 = p1_;
         draw.calculateP3p4();
+       
+       
         if( curveEnds ){
             var oldThickness = thickness;
             thickness = thick/2;
@@ -131,12 +135,52 @@ class Draw {
             Draw.outerPoly( id, true, p1_, ShapePoints.arc( p1_.x, p1_.y, thick/4, temp, Math.PI, 24 ) );
             thickness = oldThickness;
         }
+       
+       
         var q3 = { x: draw.p3.x, y: draw.p3.y };
         var q4 = { x: draw.p4.x, y: draw.p4.y };
-        drawTri( id, true, q0, q3, q1, colorLine_id );
-        drawTri( id, true, q0, q3, q4, colorLine_id );
+        drawTri( id, true, q0, q3, q1, colorFill_id );
+        drawTri( id, true, q0, q3, q4, extraFill_id );
         return draw;
     }
+   
+    public static inline function triangleJoin( id: Int, draw: Draw, p0_: Point, p1_: Point, thick: Float ){
+        var a = draw.p1;
+        var b = null;
+        var c = null;
+        if( draw.p3 != null ) {
+            b = { x: draw.p3.x, y: draw.p3.y };
+            c = { x: draw.p4.x, y: draw.p4.y };
+        }    
+        draw.p0 = p1_;
+        draw.p1 = p0_;
+        draw.halfA = Math.PI/2;
+        draw.setThickness( thick );
+        draw.calculateP3p4();
+        var q0 = { x: draw.p3.x, y: draw.p3.y };
+        var q1 = { x: draw.p4.x, y: draw.p4.y };
+        
+        //switch lines round to get other side but make sure you finish on p1 so that p3 and p4 are useful
+       
+        draw.p0 = p0_;
+        draw.p1 = p1_;
+        draw.calculateP3p4();
+        var q3 = { x: draw.p3.x, y: draw.p3.y };
+        var q4 = { x: draw.p4.x, y: draw.p4.y };
+        drawTri( id, true, q0, q3, q1, colorFill_id );
+        drawTri( id, true, q0, q3, q4, extraFill_id );
+        if( b != null ) {
+            // TODO: Need to add logic for which triangle to draw of these two.
+            // TODO: Allow use of curve instead.
+            drawTri( id, true, b, q1, p0_, extraFill_id );
+            drawTri( id, true, c, q0, p0_, colorFill_id );
+            // draw the corners 
+            //Draw.outerPolyExtra( id, true, b, ShapePoints.arc( b.x, b.y, thick/32, 0, 2*Math.PI, 24 ) );
+            //Draw.outerPoly( id, true, q1, ShapePoints.arc( q1.x, q1.y, thick/32, 0, 2*Math.PI, 24 ) );
+        }
+        return draw;
+    }
+   
     public static inline function quadCurves( id: Int, p: Array<Point>, thick: Float ){
         var curvePoints:Array<Point>;
         var curveLen: Int;
@@ -164,12 +208,12 @@ class Draw {
                 Draw.triangles( id, true, curvePoints );
             }
         }
-    }    
+    }   
     public function create2Lines( p0_: Point, p1_: Point, p2_: Point, thick: Float ){
         p0 = p0_;
         p1 = p1_;
         p2 = p2_;
-        b2 = dist( p0, p1 ); 
+        b2 = dist( p0, p1 );
         c2 = dist( p1, p2 );
         a2 = dist( p0, p2 );
         b = Math.sqrt( b2 );
@@ -191,7 +235,7 @@ class Draw {
     public inline function setThickness( val: Float ){
         _thick = val;
         beta = Math.PI/2 - halfA;
-        //if( cosA == -1  ) 
+        //if( cosA == -1  )
         //r = ( _thick/2 );Math.cos( beta )
         r = ( _thick/2 )*Math.cos( beta );
         //trace( ' r ' + r );
@@ -201,18 +245,18 @@ class Draw {
         if( _theta > 0 ){
             if( halfA < 0 ){
                 angle2 = _theta + halfA + Math.PI/2;
-                angle1 =  _theta - halfA; 
+                angle1 =  _theta - halfA;
             } else {
                 angle1 =  _theta + halfA - Math.PI;
-                angle2 =  _theta + halfA; 
+                angle2 =  _theta + halfA;
             }
         } else {
             if( halfA > 0 ){
                 angle1 =  _theta + halfA - Math.PI;
-                angle2 =  _theta + halfA; 
+                angle2 =  _theta + halfA;
             } else {
                 angle2 = _theta + halfA + Math.PI/2;
-                angle1 =  _theta - halfA; 
+                angle1 =  _theta - halfA;
             }
         }
         p3 = { x: p1.x + r * Math.cos( angle1 ), y: p1.y + r * Math.sin( angle1 ) };
@@ -223,42 +267,49 @@ class Draw {
         p1 = p2;
         p2 = p2_;
         calculateP3p4();
-    }    
+    }   
     private function theta( p0: Point, p1: Point ): Float {
         var dx: Float = p0.x - p1.x;
         var dy: Float = p0.y - p1.y;
         return Math.atan2( dy, dx );
     }
-    private function dist( p0: Point, p1: Point  ): Float {
+    public static function dist( p0: Point, p1: Point  ): Float {
         var dx: Float = p0.x - p1.x;
         var dy: Float = p0.y - p1.y;
-        return dx*dx + dy*dy; 
+        return dx*dx + dy*dy;
     }
-    
+   
     private static var q0: Point;
     private static var q1: Point;
     public static var colors: Array<UInt>;
     public static var lineCol: Array<UInt>;
     public static inline function poly( id, outline: Bool, p: Array<Point> ){
-         q0 = p[0]; 
+         q0 = p[0];
          q1 = p[0];
          var draw: Draw = firstQuad( id, p, 0 );
          for( i in 1...( p.length - 2 ) ) otherQuad( id, outline, p, draw, i );
     }
     public static inline function outerPoly( id: Int, outline: Bool, centre: Point, p: Array<Point> ){
-         q0 = p[0]; 
+         q0 = p[0];
          q1 = p[0];
          var draw: Draw = firstQuad( id, p, 0 );
          for( i in 1...( p.length - 2 ) ) outerFilledTriangles( id, outline, centre, p, draw, i );
     }
+    public static inline function outerPolyExtra( id: Int, outline: Bool, centre: Point, p: Array<Point> ){
+         q0 = p[0];
+         q1 = p[0];
+         var draw: Draw = firstQuad( id, p, 0 );
+         for( i in 1...( p.length - 2 ) ) outerFilledTrianglesExtra( id, outline, centre, p, draw, i );
+    }
+    
     public static inline function innerPoly( id: Int, outline: Bool, centre: Point, p: Array<Point> ){
-         q0 = p[0]; 
+         q0 = p[0];
          q1 = p[0];
          var draw: Draw = firstQuad( id, p, 0 );
          for( i in 1...( p.length - 2 ) ) innerFilledTriangles( id, outline, centre, p, draw, i );
     }
     public static inline function triangles( id: Int, outline: Bool, p: Array<Point> ){
-         q0 = p[0]; 
+         q0 = p[0];
          q1 = p[0];
          for( i in 0...( p.length - 2 ) ) quad( id, outline, p, i );
     }
@@ -285,10 +336,18 @@ class Draw {
     private static inline function outerFilledTriangles( id: Int, outline: Bool, centre: Point, p: Array<Point>, draw: Draw, i: Int ){
         draw.rebuildAsPoly( p[ i + 2 ]);
         var q3 = draw.p3;
-        drawTri( id, outline, q0, q3, centre, colorFill_id );
+        drawTri( id, outline, q0, q3, centre, colorLine_id );
         q0 = q3;
         return draw;
     }
+    private static inline function outerFilledTrianglesExtra( id: Int, outline: Bool, centre: Point, p: Array<Point>, draw: Draw, i: Int ){
+        draw.rebuildAsPoly( p[ i + 2 ]);
+        var q3 = draw.p3;
+        drawTri( id, outline, q0, q3, centre, extraLine_id );
+        q0 = q3;
+        return draw;
+    }
+    
     // suitable for fill.
     private static inline function innerFilledTriangles( id: Int, outline: Bool, centre: Point, p: Array<Point>, draw: Draw, i: Int ){
         draw.rebuildAsPoly( p[ i + 2 ]);
