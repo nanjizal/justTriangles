@@ -3,7 +3,8 @@ import justTriangles.Draw;
 import justTriangles.Point;
 import justTriangles.ShapePoints;
 enum LineType {
-    TriangleJoin; // arc, straight - Default seems to work quite well, but WIP.
+    TriangleJoinCurve; // arc- Default seems to work quite well, but WIP.
+    TriangleJoinStraight; // straight 
     Poly;         // polygons
     Curves;       // curves
     Round;
@@ -63,7 +64,7 @@ class PathContext {
     var tx: Float;
     var ty: Float;
     public var id: Int;
-    public var lineType: LineType = TriangleJoin;
+    public var lineType: LineType = TriangleJoinCurve;
     public function new( id_: Int, width_: Float, ?tx_: Float = 0, ?ty_: Float = 0){
         id = id_;
         dw = width_/2;
@@ -187,10 +188,15 @@ class PathContext {
         for( pp0 in ppp_ ){
             switch( lineType ){
                 // Currently best line drawing enum still under active development.
-                case TriangleJoin:
+                case TriangleJoinCurve:
                     var draw = new Draw();
                     for( i in 0...pp0.length ){
-                       if( i%1 == 0 && i< pp0.length - 2) Draw.triangleJoin( id, draw, pp0[ i ], pp0[ i + 1 ], thick/800 );
+                       if( i%1 == 0 && i< pp0.length - 2) Draw.triangleJoin( id, draw, pp0[ i ], pp0[ i + 1 ], thick/800, true );
+                    }
+                case TriangleJoinStraight:
+                    var draw = new Draw();
+                    for( i in 0...pp0.length ){
+                       if( i%1 == 0 && i< pp0.length - 2) Draw.triangleJoin( id, draw, pp0[ i ], pp0[ i + 1 ], thick/800, false );
                     }
                 // Other alternates still keeping till have developed ideal solution.
                 case Poly:
