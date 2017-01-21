@@ -117,6 +117,40 @@ class ShapePoints {
         }
         return p;
     }
+    
+    // Create Arc Points
+    public static inline function arc_internal( dx: Float, dy: Float
+                                     , radius: Float, start: Float, dA: Float, sides: Int ):Array<Point>{
+        var p: Array<Point> = new Array<Point>();         
+        var angle: Float = 0;
+        var angleInc: Float = ( Math.PI*2 )/sides;
+        var sides = Math.round( sides );
+        var nextAngle: Float;
+        if( dA < 0 ){
+            var i = -1;
+            while( true ){
+                angle = i*angleInc;
+                i--;
+                nextAngle = angle + start; 
+                if( angle <= ( dA ) ) break; //dA
+                p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
+            } 
+        } else {
+            var i = -1;
+            while( true ){
+                angle = i*angleInc;
+                i++;
+                nextAngle = angle + start; 
+                if( angle >=  ( dA + angleInc ) ) break; 
+                p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
+            } 
+            p.reverse();
+        }
+        return p;
+    }
+    
+    
+    
     // Create Arc Points
     public static inline function arc( dx: Float, dy: Float
                                      , radius: Float, start: Float, dA: Float, sides: Int ):Array<Point>{
@@ -129,9 +163,9 @@ class ShapePoints {
             var i = -1;
             while( true ){
                 angle = i*angleInc;
-                nextAngle = angle + start; 
                 i--;
-                if( angle <= dA ) break; 
+                nextAngle = angle + start; 
+                if( angle <= ( dA ) ) break; //dA
                 p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
             } 
         } else {
@@ -140,9 +174,10 @@ class ShapePoints {
                 angle = i*angleInc;
                 i++;
                 nextAngle = angle + start; 
-                if( angle >= ( dA + angleInc ) ) break; 
+                if( angle >=  ( dA + angleInc ) ) break; 
                 p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
             } 
+            
         }
         p.reverse();
         return p;
