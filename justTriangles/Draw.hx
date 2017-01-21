@@ -8,6 +8,10 @@ class Draw {
     var p2: Point;
     public var p3: Point;
     public var p4: Point;
+    public var p3old: Point;
+    public var p4old: Point;
+    public var p3old2: Point;
+    public var p4old2: Point;
     public var angleA: Float; // smallest angle between lines
     var cosA: Float;
     var b2: Float;
@@ -16,13 +20,14 @@ class Draw {
     var b: Float; // first line length
     var c: Float; // second line length
     var a: Float;
+    var clockwiseP2: Bool;
     var angleD: Float;
     public var halfA: Float;
     public var beta: Float;
     var r: Float;
     public var _theta: Float;
     public var angle1: Float;
-    var angle2: Float;
+    public var angle2: Float;
     public var thickRatio: Float = 1024;
     var _thick: Float;
     public static var thickness: Float;
@@ -144,14 +149,8 @@ class Draw {
         return draw;
     }
    
-    public static inline function triangleJoin( id: Int, draw: Draw, p0_: Point, p1_: Point, thick: Float ){
-        var a = draw.p1;
-        var b = null;
-        var c = null;
-        if( draw.p3 != null ) {
-            b = { x: draw.p3.x, y: draw.p3.y };
-            c = { x: draw.p4.x, y: draw.p4.y };
-        }    
+    public static inline function triangleJoin( id: Int, draw: Draw, p0_: Point, p1_: Point, thick: Float, ?curveEnds: Bool = false ){
+        var oldAngle = if( draw.p3 != null ) { draw.angle1; } else { null; };
         draw.p0 = p1_;
         draw.p1 = p0_;
         draw.halfA = Math.PI/2;
@@ -159,25 +158,38 @@ class Draw {
         draw.calculateP3p4();
         var q0 = { x: draw.p3.x, y: draw.p3.y };
         var q1 = { x: draw.p4.x, y: draw.p4.y };
-        
         //switch lines round to get other side but make sure you finish on p1 so that p3 and p4 are useful
-       
         draw.p0 = p0_;
         draw.p1 = p1_;
         draw.calculateP3p4();
-        var q3 = { x: draw.p3.x, y: draw.p3.y };
-        var q4 = { x: draw.p4.x, y: draw.p4.y };
-        drawTri( id, true, q0, q3, q1, colorFill_id );
-        drawTri( id, true, q0, q3, q4, extraFill_id );
-        if( b != null ) {
-            // TODO: Need to add logic for which triangle to draw of these two.
-            // TODO: Allow use of curve instead.
-            drawTri( id, true, b, q1, p0_, extraFill_id );
-            drawTri( id, true, c, q0, p0_, colorFill_id );
-            // draw the corners 
-            //Draw.outerPolyExtra( id, true, b, ShapePoints.arc( b.x, b.y, thick/32, 0, 2*Math.PI, 24 ) );
-            //Draw.outerPoly( id, true, q1, ShapePoints.arc( q1.x, q1.y, thick/32, 0, 2*Math.PI, 24 ) );
+        if( draw.p3old2 != null ){
+            var clockWise = dist( draw.p3old2, p1_ ) > dist( draw.p4old2, p1_ );
+            if( curveEnds ){
+                // arc between lines
+                if( oldAngle != null ){
+                    var dif = Math.abs( draw.angle1 - oldAngle );
+                    if( dif > 0.1 ) { // protect against angles where not worth drawing arc which fails due to distance calculations?
+                        var oldThickness = thickness;
+                        thickness = thick/2;
+                        if( clockWise ){
+                            Draw.outerPoly( id, true, p0_, ShapePoints.arc_internal( p0_.x, p0_.y, thick/4, draw.angle1, dif, 240 ) );
+                        } else {
+                            Draw.outerPoly( id, true, p0_, ShapePoints.arc_internal( p0_.x, p0_.y, thick/4, draw.angle2, -dif, 240 ) );
+                        }
+                        thickness = oldThickness;
+                    }
+                }
+            } else { /* should be in here, but there are some gaps when using curve so use the next part to fill.*/ }
+            // straight line between lines    
+            if( clockWise ){
+               drawTri( id, true, draw.p3old2, q1, p0_, extraFill_id );
+            } else {
+               drawTri( id, true, draw.p4old2, q0, p0_, colorFill_id );
+            }
+            
         }
+        drawTri( id, true, draw.p3old, draw.p3, draw.p4old, colorFill_id );
+        drawTri( id, true, draw.p3old, draw.p3, draw.p4, extraFill_id );
         return draw;
     }
    
@@ -259,6 +271,10 @@ class Draw {
                 angle1 =  _theta - halfA;
             }
         }
+        if( p3old != null ) p3old2 = p3old;
+        if( p4old != null ) p4old2 = p4old;
+        if( p3 != null ) p3old = p3;
+        if( p4 != null ) p4old = p4;
         p3 = { x: p1.x + r * Math.cos( angle1 ), y: p1.y + r * Math.sin( angle1 ) };
         p4 = { x: p1.x + r * Math.cos( angle2 ), y: p1.y + r * Math.sin( angle2 ) };
     }
