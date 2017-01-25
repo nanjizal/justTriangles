@@ -52,7 +52,7 @@ abstract PolySides( Int ) {
     var chiliagon       = 1000;
     var myriagon        = 10000;
 }
-class PathContext {
+class PathContext implements IPathContext {
     public static var circleSides: PolySides = hexacontagon;
     var dirty: Bool = true;
     var p0: Point;
