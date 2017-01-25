@@ -141,7 +141,6 @@ class SvgPath{
                     lastY = store.s1 + lastX;
                     pathContext.quadTo( controlX, controlY 
                                     ,   lastX, lastY );
-                    
                 case 'A'.code:
                     trace( 'elliptical_Arc - not implemented' );
                     extractArgs();
