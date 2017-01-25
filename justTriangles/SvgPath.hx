@@ -88,10 +88,10 @@ class SvgPath{
                     // calculate reflection of previous control points
                     controlX = 2*lastX - controlX;
                     controlY = 2*lastY - controlY;
-                    var endX = store.s4;
-                    var endY = store.s5;
-                    pathContext.curveTo( store.s0, store.s1
-                                     ,   controlX, controlY
+                    var endX = store.s2;
+                    var endY = store.s3;
+                    pathContext.curveTo( controlX, controlY
+                                     ,   store.s0, store.s1
                                      ,   endX, endY );
                 case 's'.code:
                     // TODO: add code for cases when no last control
@@ -99,12 +99,13 @@ class SvgPath{
                     // calculate reflection of previous control points
                     controlX = 2*lastX - controlX;
                     controlY = 2*lastY - controlY;
-                    var endX = store.s4 + lastX;
-                    var endY = store.s5 + lastY;
-                    pathContext.curveTo( store.s0 + lastX, store.s1 + lastY
-                                     ,   controlX, controlY
-                                     ,   endX, endY );
-                    
+                    var endX = store.s2 + lastX;
+                    var endY = store.s3 + lastY;
+                    pathContext.curveTo( controlX, controlY
+                                     ,  store.s0 + lastX, store.s1 + lastY
+                                     ,  endX, endY );
+                    lastX = endX;
+                    lastY = endY;
                 case 'Q'.code:
                     extractArgs();
                     controlX = store.s0;
@@ -141,6 +142,7 @@ class SvgPath{
                     lastY = store.s1 + lastX;
                     pathContext.quadTo( controlX, controlY 
                                     ,   lastX, lastY );
+                    
                 case 'A'.code:
                     trace( 'elliptical_Arc - not implemented' );
                     extractArgs();
@@ -212,6 +214,7 @@ class SvgPath{
                         store.push( Std.parseFloat( temp ) );
                         temp = '';
                     }
+                    //trace(' default ' + store.populatedToString() );
                     pos--;
                     break;
             }
