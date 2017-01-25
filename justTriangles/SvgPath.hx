@@ -7,6 +7,8 @@ class SvgPath{
     var pos : Int;
     var lastX: Float = 0;
     var lastY: Float = 0;
+    var controlX: Float;
+    var controlY: Float;
     var c: Int;
     var l: Int;
     var pathContext: IPathContext;
@@ -26,103 +28,120 @@ class SvgPath{
             switch( c ){
                 case 'M'.code:
                     extractArgs();
-                    var s0 = store.s0;
-                    var s1 = store.s1;
-                    pathContext.moveTo( s0, s1 );
-                    lastX = s0;
-                    lastY = s1;
+                    lastX = store.s0;
+                    lastY = store.s1;
+                    pathContext.moveTo( lastX, lastY );
                 case 'm'.code:
                     extractArgs();
-                    var s0 = store.s0 + lastX;
-                    var s1 = store.s1 + lastY;
-                    pathContext.moveTo( s0, s1 );
-                    lastX = s0;
-                    lastY = s1;
+                    lastX = store.s0 + lastX;
+                    lastY = store.s1 + lastY;
+                    pathContext.moveTo( lastX, lastY );
                 case 'L'.code:
                     extractArgs();
-                    var s0 = store.s0;
-                    var s1 = store.s1;
-                    pathContext.lineTo( s0, s1 );
-                    lastX = s0;
-                    lastY = s1;
+                    lastX = store.s0;
+                    lastY = store.s1;
+                    pathContext.lineTo( lastX, lastY );
                 case 'l'.code:
                     extractArgs();
-                    var s0 = lastX + store.s0;
-                    var s1 = lastY + store.s1;
-                    pathContext.lineTo( s0, s1 );
-                    lastX = s0;
-                    lastY = s1;
+                    lastX = store.s0 + lastX;
+                    lastY = store.s1 + lastY;
+                    pathContext.lineTo( lastX, lastY );
                 case 'H'.code:
                     extractArgs();
-                    var s0 = store.s0;
-                    var s1 = lastY;
-                    pathContext.lineTo( s0, s1 );
-                    lastX = s0;
-                    lastY = s1;
+                    lastX = store.s0;
+                    pathContext.lineTo( lastX, lastY );
                 case 'h'.code:
                     extractArgs();
-                    var s0 = lastX + store.s0;
-                    var s1 = lastY;
-                    pathContext.lineTo( s0, s1 );
-                    lastX = s0;
-                    lastY = s1;
+                    lastX = lastX + store.s0;
+                    pathContext.lineTo( lastX, lastY );
                 case 'V'.code:
                     extractArgs();
-                    var s0 = lastX;
-                    var s1 = store.s1;
-                    pathContext.lineTo( s0, s1 );
-                    lastX = s0;
-                    lastY = s1;
+                    lastY = store.s1;
+                    pathContext.lineTo( lastX, lastY );
                 case 'v'.code:
                     extractArgs();
-                    var s0 = lastX;
-                    var s1 = lastY + store.s1;
-                    pathContext.lineTo( s0, s1 );
-                    lastX = s0;
-                    lastY = s1;
+                    lastY = lastY + store.s1;
+                    pathContext.lineTo( lastX, lastY );
                 case 'C'.code:
                     extractArgs();
-                    var s0 = store.s0;
-                    var s1 = store.s1;
-                    pathContext.curveTo( s0, s1
-                                    ,   store.s2, store.s3
-                                    ,   store.s4, store.s5 );
+                    controlX = store.s2;
+                    controlY = store.s3;
                     lastX = store.s4;
                     lastY = store.s5;
-                    
+                    pathContext.curveTo( store.s0, store.s1
+                                    ,   controlX, controlY
+                                    ,   lastX, lastY );
                 case 'c'.code:
                     extractArgs();
+                    controlX = store.s2 + lastX;
+                    controlY = store.s3 + lastY;
+                    var endX = store.s4 + lastX;
+                    var endY = store.s5 + lastY;
                     pathContext.curveTo( store.s0 + lastX, store.s1 + lastY
-                                    ,   store.s2 + lastX, store.s3 + lastY
-                                    ,   store.s4 + lastX, store.s5 + lastY );
-                    lastX = store.s4 + lastX;
-                    lastY = store.s5 + lastY;
+                                    ,   controlX, controlY
+                                    ,   endX, endY );
+                    lastX = endX;
+                    lastY = endY;
                 case 'S'.code:
-                    trace( 'smooth_curveto - not implemented' );
+                    // TODO: add code for cases when no last control
                     extractArgs();
+                    // calculate reflection of previous control points
+                    controlX = 2*lastX - controlX;
+                    controlY = 2*lastY - controlY;
+                    var endX = store.s4;
+                    var endY = store.s5;
+                    pathContext.curveTo( store.s0, store.s1
+                                     ,   controlX, controlY
+                                     ,   endX, endY );
                 case 's'.code:
-                    trace( 'relative smooth_curveto - not implemented' );
+                    // TODO: add code for cases when no last control
                     extractArgs();
+                    // calculate reflection of previous control points
+                    controlX = 2*lastX - controlX;
+                    controlY = 2*lastY - controlY;
+                    var endX = store.s4 + lastX;
+                    var endY = store.s5 + lastY;
+                    pathContext.curveTo( store.s0 + lastX, store.s1 + lastY
+                                     ,   controlX, controlY
+                                     ,   endX, endY );
+                    
                 case 'Q'.code:
                     extractArgs();
-                    var s0 = store.s0;
-                    var s1 = store.s1;
-                    pathContext.quadTo( s0, s1
-                                    ,   store.s2, store.s3 );
+                    controlX = store.s0;
+                    controlY = store.s1;
                     lastX = store.s2;
                     lastY = store.s3;
+                    pathContext.quadTo( controlX, controlY
+                                    ,   lastX, lastY );
                 case 'q'.code:
                     extractArgs();
-                    pathContext.quadTo( lastX + store.s0, lastY + store.s1
-                                    ,   store.s2 + lastX, store.s3 + lastY );
-                    lastX = store.s2 + lastX;
-                    lastY = store.s3 + lastY;
+                    controlX = lastX + store.s0;
+                    controlY = lastY + store.s1;
+                    lastX = store.s0 + lastX;
+                    lastY = store.s1 + lastY;
+                    pathContext.quadTo( controlX, controlY 
+                                    ,   lastX, lastY );
                 case 'T'.code:
-                    trace( 'smooth_quadratic_Bézier_curveto - not implemented' );
+                // TODO: add code for cases when no last control
                     extractArgs();
+                    // calculate reflection of previous control points
+                    controlX = 2*lastX  - controlX;
+                    controlY = 2*lastY - controlY;
+                    lastX = store.s0;   
+                    lastY = store.s1;
+                    pathContext.quadTo( controlX, controlY 
+                                    ,   lastX, lastY );
                 case 't'.code:
-                    trace( 'relative smooth_quadratic_Bézier_curveto - not implemented' );
+                // TODO: add code for cases when no last control
                     extractArgs();
+                    // calculate reflection of previous control points
+                    controlX = 2*lastX - controlX;
+                    controlY = 2*lastY - controlY;
+                    lastX = store.s0 + lastY;
+                    lastY = store.s1 + lastX;
+                    pathContext.quadTo( controlX, controlY 
+                                    ,   lastX, lastY );
+                    
                 case 'A'.code:
                     trace( 'elliptical_Arc - not implemented' );
                     extractArgs();
@@ -150,13 +169,12 @@ class SvgPath{
     // scientifc numbers not implemented yet
     function extractArgs() {
         store.clear();
-        pos++;
+        //pos++;
         c = nextChar();
         var count = 0;
         var temp: String = '';
-        while( pos < l ) {
+        while( true ) {
             switch( c ) {
-                
                 case '-'.code:
                     if( temp != '' ){
                         store.push( Std.parseFloat( temp ) );
@@ -190,6 +208,7 @@ class SvgPath{
                         temp = '';
                     }
                 default:
+                    trace( 'default ' + str.substr( pos, 1 ) );
                     if( temp != '' ){
                         store.push( Std.parseFloat( temp ) );
                         temp = '';
