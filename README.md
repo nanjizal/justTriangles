@@ -1,4 +1,8 @@
 # justTriangles
+
+## NO POINT - Branch removes Point class in the hope that no Point structure will reduce calculations.
+### Still requires some work with setting up some of the loops like the fill, and testing.
+
 Vector shape generation with triangles helper library
 
 Example WebGL use please see:
