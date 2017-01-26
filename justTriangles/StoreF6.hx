@@ -19,7 +19,7 @@ class StoreF6{
         s5 = null;
     }
     inline public function length(): Int {
-        return l + 1;
+        return l;
     }
     inline public function push( v: Float ){
         switch( l ){
