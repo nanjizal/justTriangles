@@ -13,12 +13,20 @@ class SvgPath{
     var l: Int;
     var pathContext: IPathContext;
     var store: StoreF6;
+    var dx: Float;
+    var dy: Float;
+    var sx: Float;
+    var sy: Float;
     public function new( pathContext_: IPathContext ){
         pathContext = pathContext_;
     }
     // currently not much protection against malformed, or unusual path data.
-    public function parse( str_: String ): String{
+    public function parse( str_: String, ?dx_: Float = 0, ?dy_: Float = 0, ?sx_: Float = 1, sy_: Float = 1 ): String {
         str = str_;
+        dx = dx_;
+        dy = dy_;
+        sx = sx_;
+        sy = sy_;
         pos = 0;
         l = str.length;
         c = nextChar();
@@ -93,6 +101,8 @@ class SvgPath{
                     pathContext.curveTo( controlX, controlY
                                      ,   store.s0, store.s1
                                      ,   endX, endY );
+                    controlX = store.s0;
+                    controlY = store.s1;
                 case 's'.code:
                     // TODO: add code for cases when no last control
                     extractArgs();
@@ -104,6 +114,8 @@ class SvgPath{
                     pathContext.curveTo( controlX, controlY
                                      ,  store.s0 + lastX, store.s1 + lastY
                                      ,  endX, endY );
+                    controlX = store.s0 + lastX;
+                    controlY = store.s1 + lastY;
                     lastX = endX;
                     lastY = endY;
                 case 'Q'.code:
@@ -178,7 +190,12 @@ class SvgPath{
             switch( c ) {
                 case '-'.code:
                     if( temp != '' ){
-                        store.push( Std.parseFloat( temp ) );
+                        if( ( store.length() & 1) == 0 ) { // x 
+                            if( temp == '0' ) temp = '0.1';
+                            store.push( Std.parseFloat( temp )*sx + dx );
+                        } else { // y
+                            store.push( Std.parseFloat( temp )*sy + dy );
+                        }
                     }
                     temp = '-';
                 case '.'.code:
@@ -205,15 +222,26 @@ class SvgPath{
                     temp = temp + '9';
                 case ' '.code,','.code:
                     if( temp != '' ){
-                        store.push( Std.parseFloat( temp ) );
+                        if( ( store.length() & 1) == 0 ) { // x 
+                            if( temp == '0' ) temp = '0.1';
+                            store.push( Std.parseFloat( temp )*sx + dx );
+                        } else { // y
+                            store.push( Std.parseFloat( temp )*sy + dy );
+                        }
                         temp = '';
                     }
                 default:
                     trace( 'default ' + str.substr( pos, 1 ) );
                     if( temp != '' ){
-                        store.push( Std.parseFloat( temp ) );
+                        if( temp == '0' ) temp = '0.1';
+                        if( ( store.length() & 1) == 0 ) { // x 
+                            store.push( Std.parseFloat( temp )*sx + dx );
+                        } else { // y
+                            store.push( Std.parseFloat( temp )*sy + dy );
+                        }
                         temp = '';
                     }
+                    //useful for debug:
                     //trace(' default ' + store.populatedToString() );
                     pos--;
                     break;
