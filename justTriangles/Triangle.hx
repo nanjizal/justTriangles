@@ -1,9 +1,12 @@
 package justTriangles;
-import justTriangles.Point;
 class Triangle {
     public static var triangles = new Array<Triangle>();
-    public static inline function drawTri(   id: Int, outline: Bool, p0: Point, p1: Point, p2: Point, colorID: Int ):Void {
-        triangles.push( new Triangle( id, outline, p0, p1, p2, 0, colorID ) );
+    public static inline function drawTri(  id: Int, outline: Bool
+                                        ,   p0x: Float, p0y: Float 
+                                        ,   p1x: Float, p1y: Float 
+                                        ,   p2x: Float, p2y: Float
+                                        ,   colorID: Int ):Void {
+        triangles.push( new Triangle( id, outline, p0x, p0y, p1x, p1y, p2x, p2y, 0, colorID ) );
     };
     public var id: Int;
     public var colorID: Int;
@@ -55,47 +58,38 @@ class Triangle {
     }   
     public function new(  id_: Int
                         , outline_: Bool
-                        , A_: Point, B_: Point, C_: Point
+                        , ax_: Float, ay_: Float
+                        , bx_: Float, by_: Float 
+                        , cx_: Float, cy_: Float
                         , depth_: Float
                         , colorID_: Int
                         ){
         id = id_;
         outline = outline_;
-        if( adjustWinding( A_, B_, C_ ) ){
-            ax = A_.x;
-            ay = A_.y;
-            bx = C_.x;
-            by = C_.y;
-            cx = B_.x;
-            cy = B_.y;
-        } else {
-            ax = A_.x;
-            ay = A_.y;
-            bx = B_.x;
-            by = B_.y;
-            cx = C_.x;
-            cy = C_.y;
+        if( windingGood( ax_, ay_, bx_, by_, cx_, cy_ ) ){
+            ax = ax_;
+            ay = ay_;
+            bx = bx_;
+            by = by_;
+            cx = cx_;
+            cy = cy_;
+        } else {    
+            ax = ax_;
+            ay = ay_;
+            bx = cx_;
+            by = cy_;
+            cx = bx_;
+            cy = by_;
         }
         depth = depth_;
         colorID = colorID_;
     }
     // A B C, you can find the winding by computing the cross product (B - A) x (C - A)
-    inline static function adjustWinding( A_: Point, B_: Point, C_: Point ): Bool{
-        var val: Bool = !( cross( subtract( B_, A_ ), subtract( C_, A_ ) ) < 0 );
-        return val;
-    }
-    // subtract
-    inline static function subtract( p0:Point, p1:Point ) : Point {
-        return { x: p0.x - p1.x, y: p0.y - p1.y };
-    }
-    // to get the cross product
-    inline static function cross(p0:Point, p1:Point) : Float {
-        return p0.x*p1.y - p0.y*p1.x;
+    inline static function windingGood( ax: Float, ay: Float, bx: Float, by: Float, cx: Float, cy: Float ): Bool{
+        return ( ((bx - ax)*(cx - ax) - (by - by)*(cx - ax) ) < 0 );
     }
     //http://www.emanueleferonato.com/2012/06/18/algorithm-to-determine-if-a-point-is-inside-a-triangle-with-mathematics-no-hit-test-involved/
-    public function hitTest( P: Point ): Bool {
-        var px: Float = P.x;
-        var py: Float = P.y;
+    public function hitTest( px: Float, py: Float ): Bool {
         if( px > x && px < right && py > y && py < bottom ) return true;
         var planeAB = ( ax - px )*( by - py ) - ( bx - px )*( ay - py );
         var planeBC = ( bx - px )*( cy - py ) - ( cx - px )*( by - py );
