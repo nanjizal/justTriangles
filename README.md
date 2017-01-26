@@ -1,9 +1,9 @@
 # justTriangles
 Vector shape generation with triangles helper library - mostly just lines rather than fills all generated with lots of little triangles!
 
-Now supports SVG path data parsing, this DroidSans font path data is not quite rendering properly yet, but the bird is close.
+Now supports SVG path data parsing, such as thes DroidSans font path data and the bird.
 
-![](https://cloud.githubusercontent.com/assets/20134338/22316071/8df177da-e362-11e6-86ab-c7746569be1c.png)
+![](https://cloud.githubusercontent.com/assets/20134338/22331662/91c39c82-e3c4-11e6-8bc6-ee5ad0197ad4.png)
 
 
 Example WebGL use please see:
