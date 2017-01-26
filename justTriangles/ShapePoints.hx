@@ -1,95 +1,129 @@
 package justTriangles;
-import justTriangles.Point;
+//import justTriangles.Point;
 import justTriangles.Bezier;
+using justTriangles.ShapePoints;
 class ShapePoints {
-    // Create Rectangular Box Points
-    public static inline function boxPoints( p: Point, wid: Float, hi: Float ): Array<Point>{
-        var p: Array<Point> = [     { x: p.x, y: p.y }
-                                ,   { x: p.x+wid, y: p.y }
-                                ,   { x: p.x+wid, y: p.y+hi }
-                                ,   { x: p.x, y: p.y+hi }
-                                ,   { x: p.x, y: p.y }
-                                ,   { x: p.x+wid, y: p.y }
-                                ,   { x: p.x+wid, y: p.y+hi }
-                                ];
-        return p;
-    }
-    // Create Rectangular Box Points
-    public static inline function box( x: Float,y: Float, wid: Float, hi: Float ): Array<Point>{
-        var p: Array<Point> = [     { x: x, y: y }
-                                ,   { x: x+wid, y: y }
-                                ,   { x: x+wid, y: y+hi }
-                                ,   { x: x, y: y+hi }
-                                ,   { x: x, y: y }
-                                ,   { x: x+wid, y: y }
-                                ,   { x: x+wid, y: y+hi }
-                                ];
+    /*
+    public static inline function reversePoints( p: Array<Float> ): Array<Float> {
+        var x: Float;
+        var y: Float;
+        var l = p.length;
+        for( i in 0...l ){
+            if( (i & 1) == 0 ){
+                x = p[i];
+                y = p[i+1];
+                p[i] = y;
+                p[i+1] = x;
+            }
+        }
         p.reverse();
+    }
+    */
+    public static inline function reversePoints( p: Array<Float> ): Array<Float> {
+        var xl: Float;
+        var yl: Float;
+        var xr: Float;
+        var yr: Float;
+        var l = p.length;
+        var r: Int;
+        var lm = p.length - 1;
+        var half = Std.int( p.length/2 );
+        for( i in 0...half ){
+            if( (i & 1) == 0 ){
+                xl = p[ i ];
+                yl = p[ i+1 ];
+                r = lm - i;
+                xr = p[ r - 1 ];
+                yr = p[ r ];
+                p[i] = xr;
+                p[i+1] = yr;
+                p[r-1] = xl;
+                p[r] = yl;
+            }
+        }
         return p;
     }
+    // Create Rectangular Box Points
+    public static inline function boxPoints( p: Array<Float>, px: Float, py: Float, wid: Float, hi: Float ){
+        p = p.concat([ px, py, px + wid, py, px + wid, py + hi, px, py + hi, px, py, px + wid, py, px + wid, py + hi ]);
+        return p;
+    }
+    /*
+    // Create Rectangular Box Points
+    public static inline function box( x: Float,y: Float, wid: Float, hi: Float ): Array<Float>{
+        boxPoints( x, y, wid, hi );
+        p.reversePoints();
+        return p;
+    }
+    */
     // Create Equalatrial Triangle points
-    public static inline function equalTri( dx: Float, dy: Float
-                                                , radius: Float, ?rotation: Float = 0 ):Array<Point>{
-        var p: Array<Point> = new Array<Point>();
-        var angle: Float = 0;
-        var offset: Float = - 2.5*Math.PI*2/6 - Math.PI + rotation;
+    public static inline function equalTri( p: Array<Float>, dx: Float, dy: Float
+                                                , radius: Float, ?rotation: Float = 0 ):Array<Float>{
+        var angle = 0.;
+        var offset = - 2.5*Math.PI*2/6 - Math.PI + rotation;
         for( i in 0...6 ){
-            angle = i*( Math.PI*2 )/3 - offset; 
-            p.push( { x: dx + radius * Math.cos( angle ), y: dy + radius * Math.sin( angle ) });
+            angle = i*( Math.PI*2 )/3 - offset;
+            p.push( dx + radius * Math.cos( angle ) ); // check if array access is faster p[Std.int(i*2)];
+            p.push( dy + radius * Math.sin( angle ) );
         } 
-        p.reverse();
+        // p.reversePoints();
         return p;
     }
     // Create Polygon Points
-    public static inline function polyPoints( d: Point, radius: Float, sides: Int, ?rotation: Float = 0 ):Array<Point>{
-        var p: Array<Point> = new Array<Point>();
-        var angle: Float = 0;
-        var angleInc: Float = ( Math.PI*2 )/sides;
-        var offset: Float = rotation - Math.PI/2;
+    public static inline function polyPoints( p: Array<Float>, d: Point, radius: Float, sides: Int, ?rotation: Float = 0 ):Array<Float>{
+        var angle = 0.;
+        var angleInc = ( Math.PI*2 )/sides;
+        var offset = rotation - Math.PI/2;
         for( i in 0...( sides + 3 ) ){
             angle = i*angleInc;
             angle = angle + offset; // ?  to test!
-            p.push( { x: d.x + radius * Math.cos( angle ), y: d.y + radius * Math.sin( angle ) });
+            p.push( d.x + radius * Math.cos( angle ) );
+            p.push( d.y + radius * Math.sin( angle ) );
         } 
-        //p.reverse();
         return p;
     }
+    /*
     // Create Polygon Points
     public static inline function poly( dx: Float, dy: Float
-                                      , radius: Float, sides: Int ):Array<Point>{
-        var p: Array<Point> = new Array<Point>();
-        var angle: Float = 0;
-        var angleInc: Float = ( Math.PI*2 )/sides;
+                                      , radius: Float, sides: Int ):Array<Float>{
+        var p = new Array<Float>();
+        var angle = 0.;
+        var angleInc = ( Math.PI*2 )/sides;
         for( i in 0...( sides + 3 ) ){
             angle = i*angleInc; 
-            p.push( { x: dx + radius * Math.cos( angle ), y: dy + radius * Math.sin( angle ) });
+            p.push( dx + radius * Math.cos( angle ) );
+            p.push( dy + radius * Math.sin( angle ) );
         } 
-        p.reverse();
+        p.reversePoints();
         return p;
     }
+    */
     // Create Horizontal Wave Points
-    public static inline function horizontalWave( x_: Float, dx_: Float, y_: Float
-                                                , amplitude: Float, sides: Int, repeats: Float ):Array<Point>{
-        var p: Array<Point> = new Array<Point>(); 
+    public static inline function horizontalWave( p: Array<Float>, x_: Float, dx_: Float, y_: Float
+                                                , amplitude: Float, sides: Int, repeats: Float ):Array<Float>{
         var dx: Float = 0;
         var angleInc: Float = ( Math.PI*2 )/sides;
         var len: Int = Std.int( sides*repeats );
-        for( i in 0...len ) p.push( { x: x_ + (dx+=dx_), y: y_ + amplitude * Math.sin( i*angleInc ) });
+        for( i in 0...len ) {
+            p.push( x_ + ( dx += dx_ ) );
+            p.push( y_ + amplitude * Math.sin( i*angleInc ) );
+        }
         return p;
     }
     // Create Vertical Wave Points
-    public static inline function verticalWave( x_: Float, y_: Float, dy_: Float
-                                              , amplitude: Float, sides: Int, repeats: Float ):Array<Point>{
-        var p: Array<Point> = new Array<Point>(); 
+    public static inline function verticalWave( p: Array<Float>, x_: Float, y_: Float, dy_: Float
+                                              , amplitude: Float, sides: Int, repeats: Float ):Array<Float>{
         var dy: Float = 0;
         var angleInc: Float = ( Math.PI*2 )/sides;
         var len: Int = Std.int( sides*repeats );
-        for( i in 0...len ) p.push( { y: y_ + (dy+=dy_), x: x_ + amplitude * Math.sin( i*angleInc ) });
+        for( i in 0...len ) {
+            p.push( y_ + ( dy += dy_ ) );
+            p.push( x_ + amplitude * Math.sin( i*angleInc ) );
+        }
         return p;
     }
     // Create Arc Points
-    public static inline function arcPoints( d: Point, radius: Float, start: Float, dA: Float, sides: Int ):Array<Point>{
-        var p: Array<Point> = new Array<Point>();
+    public static inline function arcPoints( p: Array<Float>, d: Point, radius: Float, start: Float, dA: Float, sides: Int ):Array<Float>{
         var dx = d.x;
         var dy = d.y;
         var angle: Float = 0;
@@ -103,7 +137,8 @@ class ShapePoints {
                 nextAngle = angle + start; 
                 i--;
                 if( angle <= dA ) break; 
-                p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
+                p.push( dx + radius * Math.cos( nextAngle ) );
+                p.push( dy + radius * Math.sin( nextAngle ) );
             } 
         } else {
             var i = -1;
@@ -112,16 +147,16 @@ class ShapePoints {
                 i++;
                 nextAngle = angle + start; 
                 if( angle >= ( dA + angleInc ) ) break; 
-                p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
+                p.push( dx + radius * Math.cos( nextAngle ) );
+                p.push( dy + radius * Math.sin( nextAngle ) );
             } 
         }
         return p;
     }
     
     // Create Arc Points
-    public static inline function arc_internal( dx: Float, dy: Float
-                                     , radius: Float, start: Float, dA: Float, sides: Int ):Array<Point>{
-        var p: Array<Point> = new Array<Point>();         
+    public static inline function arc_internal( p: Array<Float>, dx: Float, dy: Float
+                                     , radius: Float, start: Float, dA: Float, sides: Int ):Array<Float>{
         var angle: Float = 0;
         var angleInc: Float = ( Math.PI*2 )/sides;
         var sides = Math.round( sides );
@@ -133,28 +168,30 @@ class ShapePoints {
                 i--;
                 nextAngle = angle + start; 
                 if( angle <= ( dA ) ) break; //dA
-                p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
+                p.push( dx + radius * Math.cos( nextAngle ) );
+                p.push( dy + radius * Math.sin( nextAngle ) );
             } 
         } else {
             var i = -1;
+            var p2 = new Array<Float>();
             while( true ){
                 angle = i*angleInc;
                 i++;
                 nextAngle = angle + start; 
                 if( angle >=  ( dA + angleInc ) ) break; 
-                p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
+                p2.push( dx + radius * Math.cos( nextAngle ) );
+                p2.push( dy + radius * Math.sin( nextAngle ) );
             } 
-            p.reverse();
+            p2.reversePoints();  // TODO: rearrange to avoid?
+            p = p.concat( p );
         }
         return p;
     }
     
-    
-    
     // Create Arc Points
-    public static inline function arc( dx: Float, dy: Float
-                                     , radius: Float, start: Float, dA: Float, sides: Int ):Array<Point>{
-        var p: Array<Point> = new Array<Point>();         
+    public static inline function arc( p: Array<Float>, dx: Float, dy: Float
+                                     , radius: Float, start: Float, dA: Float, sides: Int ):Array<Float>{
+        var p2: Array<Float> = new Array<Float>();         
         var angle: Float = 0;
         var angleInc: Float = ( Math.PI*2 )/sides;
         var sides = Math.round( sides );
@@ -166,7 +203,8 @@ class ShapePoints {
                 i--;
                 nextAngle = angle + start; 
                 if( angle <= ( dA ) ) break; //dA
-                p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
+                p2.push( dx + radius * Math.cos( nextAngle ) );
+                p2.push( dy + radius * Math.sin( nextAngle ) );
             } 
         } else {
             var i = -1;
@@ -175,81 +213,64 @@ class ShapePoints {
                 i++;
                 nextAngle = angle + start; 
                 if( angle >=  ( dA + angleInc ) ) break; 
-                p.push( { x: dx + radius * Math.cos( nextAngle ), y: dy + radius * Math.sin( nextAngle ) });
+                p2.push( dx + radius * Math.cos( nextAngle ) );
+                p2.push( dy + radius * Math.sin( nextAngle ) );
             } 
             
         }
-        p.reverse();
+        p2.reversePoints(); // arrange to avoid or remove arc?
+        p = p.concat( p2 );
         return p;
     }
     public static var quadStep: Float = 0.03;
     // Create Quadratic Curve
-    public static inline function quadCurve( p0, p1, p2 ): Array<Point> {
-        var p: Array<Point> = new Array<Point>(); 
-        var approxDistance = distance( p0, p1 ) + distance( p1, p2 );
-        var v: { x: Float, y: Float };
+    public static inline function quadCurve(    p: Array<Float>
+                                            ,   p0x: Float, p0y: Float
+                                            ,   p1x: Float, p1y: Float
+                                            ,   p2x: Float, p2y: Float ): Array<Float> {
+        var approxDistance = distance( p0x, p0y, p1x, p1y ) + distance( p1x, p1y, p2x, p2y );
         if( approxDistance == 0 ) approxDistance = 0.000001;
         var step = Math.min( 1/( approxDistance*0.707 ), quadStep );
-        var arr = [ p0, p1, p2 ];
-        var t = 0.0;
-        /*
-        v = Bezier.quadratic( 0.0, arr );
-        p.push( { x: v.x, y: v.y } );*/
-        p.push( p0 );
-        t += step;
+        p.push( p0x );
+        p.push( p0y );
+        var t = step;
         while( t < 1 ){
-            v = Bezier.quadratic( t, arr );
-            p.push( { x: v.x, y: v.y } );
+            p.push( Bezier.quadratic( t, p0x, p1x, p2x ) );
+            p.push( Bezier.quadratic( t, p0y, p1y, p2y ) );
             t += step;
         }
-        /*
-        v = Bezier.quadratic( 1.0, arr );
-        p.push( { x: v.x, y: v.y } );
-        */
-        p.push( p2 );
+        p.push( p2x );
+        p.push( p2y );
         return p;
     }
     public static var cubicStep: Float = 0.03;
     // Create Cubic Curve
-    public static inline function cubicCurve( p0, p1, p2, p3 ): Array<Point> {
-        var p: Array<Point> = new Array<Point>(); 
-        var approxDistance = distance( p0, p1 ) + distance( p1, p2 ) + distance( p2, p3 );
-        var v: { x: Float, y: Float };
+    public static inline function cubicCurve( p: Array<Float>
+                                            , p0x: Float, p0y: Float
+                                            , p1x: Float, p1y: Float
+                                            , p2x: Float, p2y: Float
+                                            , p3x: Float, p3y: Float ): Array<Float> {
+        var p: Array<Float> = new Array<Float>(); 
+        var approxDistance = distance( p0x, p0y, p1x, p1y ) + distance( p1x, p1y, p2x, p2y ) + distance( p2x, p2y, p3x, p3y );
         if( approxDistance == 0 ) approxDistance = 0.000001;
         var step = Math.min( 1/( approxDistance*0.707 ), cubicStep );
-        var arr = [ p0, p1, p2, p3 ];
-        var t = 0.0;
-        v = Bezier.cubic( 0.0, arr );
-        p.push( { x: v.x, y: v.y } );
-        t += step;
+        p.push( p0x );
+        p.push( p0y );
+        var t = step;
         while( t < 1 ){
-            v = Bezier.cubic( t, arr );
-            p.push( { x: v.x, y: v.y } );
+            p.push( Bezier.cubic( t, p0x, p1x, p2x, p3x ) );
+            p.push( Bezier.cubic( t, p0y, p1y, p2y, p3y ) );
             t += step;
         }
-        v = Bezier.cubic( 1.0, arr );
-        p.push( { x: v.x, y: v.y } );
+        p.push( p3x );
+        p.push( p3y );
         return p;
     }
-    public static inline function distance(     p0: { x: Float, y: Float }
-                                            ,   p1: { x: Float, y: Float }
+    public static inline function distance(     p0x: Float, p0y: Float
+                                            ,   p1x: Float, p1y: Float
                                             ): Float {
-        var x = p0.x - p1.x;
-        var y = p0.y - p1.y;
+        var x = p0x - p1x;
+        var y = p0y - p1y;
         return Math.sqrt( x*x + y*y );
-    }
-    public inline static function quadraticBezier(  t: Float
-                                                ,   arr: Array<{ x: Float, y: Float }>
-                                                ): { x: Float,y: Float } {
-                                                    return {  x: _quadraticBezier( t, arr[ 0 ].x, arr[ 1 ].x, arr[ 2 ].x )
-                                                            , y: _quadraticBezier( t, arr[ 0 ].y, arr[ 1 ].y, arr[ 2 ].y ) };
-    }
-    private inline static function _quadraticBezier ( t: Float
-                                                    , startPoint: Float
-                                                    , controlPoint: Float
-                                                    , endPoint: Float
-                                                    ): Float {
-        var u = 1 - t;
-        return Math.pow( u, 2 ) * startPoint + 2 * u * t * controlPoint + Math.pow( t, 2 ) * endPoint;
     }
 }
