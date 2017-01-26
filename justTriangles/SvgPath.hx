@@ -13,10 +13,10 @@ class SvgPath{
     var l: Int;
     var pathContext: IPathContext;
     var store: StoreF6;
-    var dx: Float;
-    var dy: Float;
-    var sx: Float;
-    var sy: Float;
+    var dx: Float = 0;
+    var dy: Float = 0;
+    var sx: Float = 1;
+    var sy: Float = 1;
     public function new( pathContext_: IPathContext ){
         pathContext = pathContext_;
     }
@@ -27,6 +27,7 @@ class SvgPath{
         dy = dy_;
         sx = sx_;
         sy = sy_;
+        
         pos = 0;
         l = str.length;
         c = nextChar();
@@ -55,20 +56,20 @@ class SvgPath{
                     lastY = store.s1 + lastY;
                     pathContext.lineTo( lastX, lastY );
                 case 'H'.code:
-                    extractArgs();
-                    lastX = store.s0;
+                    extractArgs(false);
+                    lastX = store.s0*sx + dx;
                     pathContext.lineTo( lastX, lastY );
                 case 'h'.code:
-                    extractArgs();
-                    lastX = lastX + store.s0;
+                    extractArgs(false);
+                    lastX = lastX + store.s0*sx + dx;
                     pathContext.lineTo( lastX, lastY );
                 case 'V'.code:
-                    extractArgs();
-                    lastY = store.s1;
+                    extractArgs(false);
+                    lastY = store.s0*sy + dy;
                     pathContext.lineTo( lastX, lastY );
                 case 'v'.code:
-                    extractArgs();
-                    lastY = lastY + store.s1;
+                    extractArgs(false);
+                    lastY = lastY + store.s0*sy + dy;
                     pathContext.lineTo( lastX, lastY );
                 case 'C'.code:
                     extractArgs();
@@ -164,7 +165,7 @@ class SvgPath{
                 case 'Z'.code, 'z'.code: 
                     lastX = 0;
                     lastY = 0;
-                    trace( 'closepath' );
+                    //trace( 'closepath' );
                     //break;
                 case 'B'.code:
                     trace( 'bearing - not implemented' );
@@ -180,7 +181,7 @@ class SvgPath{
     // Assumes all values are float
     // new lines not yet implemented
     // scientifc numbers not implemented yet
-    function extractArgs() {
+    function extractArgs( ?process: Bool = true ) {
         store.clear();
         //pos++;
         c = nextChar();
@@ -190,11 +191,15 @@ class SvgPath{
             switch( c ) {
                 case '-'.code:
                     if( temp != '' ){
-                        if( ( store.length() & 1) == 0 ) { // x 
-                            if( temp == '0' ) temp = '0.1';
-                            store.push( Std.parseFloat( temp )*sx + dx );
-                        } else { // y
-                            store.push( Std.parseFloat( temp )*sy + dy );
+                        if( temp == '0' ) temp = '0.1';
+                        if( process ){
+                            if( ( store.length() & 1) == 0 ) { // x 
+                                store.push( Std.parseFloat( temp )*sx + dx );
+                            } else { // y
+                                store.push( Std.parseFloat( temp )*sy + dy );
+                            }
+                        } else {
+                            store.push( Std.parseFloat( temp ) );
                         }
                     }
                     temp = '-';
@@ -222,26 +227,33 @@ class SvgPath{
                     temp = temp + '9';
                 case ' '.code,','.code:
                     if( temp != '' ){
-                        if( ( store.length() & 1) == 0 ) { // x 
-                            if( temp == '0' ) temp = '0.1';
-                            store.push( Std.parseFloat( temp )*sx + dx );
-                        } else { // y
-                            store.push( Std.parseFloat( temp )*sy + dy );
+                        if( temp == '0' ) temp = '0.1';
+                        if( process ){
+                            if( ( store.length() & 1) == 0 ) { // x 
+                                store.push( Std.parseFloat( temp )*sx + dx );
+                            } else { // y
+                                store.push( Std.parseFloat( temp )*sy + dy );
+                            }
+                        } else { // for special cases V,v,H,h where only one var is stored.
+                            store.push( Std.parseFloat( temp ) );
                         }
                         temp = '';
                     }
                 default:
-                    trace( 'default ' + str.substr( pos, 1 ) );
                     if( temp != '' ){
                         if( temp == '0' ) temp = '0.1';
-                        if( ( store.length() & 1) == 0 ) { // x 
-                            store.push( Std.parseFloat( temp )*sx + dx );
-                        } else { // y
-                            store.push( Std.parseFloat( temp )*sy + dy );
+                        if( process ){
+                            if( ( store.length() & 1) == 0 ) { // x 
+                                store.push( Std.parseFloat( temp )*sx + dx );
+                            } else { // y
+                                store.push( Std.parseFloat( temp )*sy + dy );
+                            }
+                        } else { // for special cases V,v,H,h where only one var is stored.
+                            store.push( Std.parseFloat( temp ) );
                         }
                         temp = '';
                     }
-                    //useful for debug:
+                    // Useful for debug:
                     //trace(' default ' + store.populatedToString() );
                     pos--;
                     break;
