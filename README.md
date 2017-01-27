@@ -8,7 +8,12 @@ Now supports SVG path data parsing, such as thes DroidSans font path data and th
 
 
 ## Fills
-For simple fills I have included **PolyK** library, just set fill to true on PathContext, but beware default curve settings are very high so this is very slow, so turned off for drawing the font.
+For simple fills I have included **PolyK** library, set fill to true on PathContext, and reduce Curve settings from 0.03 
+
+ShapePoints.quadStep = 0.2;
+ShapePoints.cubicStep = 0.2;
+
+Perhaps I need to create two arrays one of paths and one for fills?
 
 ![]( https://cloud.githubusercontent.com/assets/20134338/22377303/42bd7e92-e4a9-11e6-8e96-2803da056b56.png )
 
