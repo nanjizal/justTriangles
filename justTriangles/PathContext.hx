@@ -2,6 +2,7 @@ package justTriangles;
 import justTriangles.Draw;
 import justTriangles.Point;
 import justTriangles.ShapePoints;
+import justTriangles.PolyK;
 enum LineType {
     TriangleJoinCurve; // arc- Default seems to work quite well, but WIP.
     TriangleJoinStraight; // straight 
@@ -54,6 +55,7 @@ abstract PolySides( Int ) {
 }
 class PathContext implements IPathContext {
     public static var circleSides: PolySides = hexacontagon;
+    public var fill: Bool = false;
     var dirty: Bool = true;
     var p0: Point;
     var pp: Array<Point>;
@@ -182,9 +184,55 @@ class PathContext implements IPathContext {
         moveToPoint( pMore[0] );
         for( p in pMore  ) pp.push( p );
     }
+    public function fillTriangles(){
+        //if( dirty ) reverseEntries();
+        var p: Point;
+        for( pp0 in ppp_ ){
+            var poly = new Array();
+            for( i in 0...pp0.length ){
+                p = pp0[i];
+                poly.push( p.x );
+                poly.push( p.y );
+            }
+            polyKFill( poly );
+        }
+    } 
+    
+    public inline function polyKFill( poly: Array<Float> ){
+        var tgs = PolyK.triangulate( poly ); 
+        var triples = new ArrayTriple( tgs );
+        var a: Point;
+        var b: Point;
+        var c: Point;
+        var i: Int;
+        for( tri in triples ){
+            i = Std.int( tri.a*2 );
+            a = { x: poly[ i ], y: poly[ i + 1 ] };
+            i = Std.int( tri.b*2 );
+            b = { x: poly[ i ], y: poly[ i + 1 ] };
+            i = Std.int( tri.c*2 );
+            c = { x: poly[ i ], y: poly[ i + 1 ] };
+            var tgs = PolyK.triangulate( poly ); 
+            var triples = new ArrayTriple( tgs );
+            var a: Point;
+            var b: Point;
+            var c: Point;
+            var i: Int;
+            for( tri in triples ){
+                i = Std.int( tri.a*2 );
+                a = { x: poly[ i ], y: poly[ i + 1 ] };
+                i = Std.int( tri.b*2 );
+                b = { x: poly[ i ], y: poly[ i + 1 ] };
+                i = Std.int( tri.c*2 );
+                c = { x: poly[ i ], y: poly[ i + 1 ] };
+                Draw.drawTri( id, false, a,b,c, Draw.colorFill_id );
+            }
+        }
+    }
     public function render( thick: Float, ?outline: Bool = true ){
         Draw.thick = thick;
         if( dirty ) reverseEntries();
+        if( fill ) fillTriangles();
         for( pp0 in ppp_ ){
             switch( lineType ){
                 // Currently best line drawing enum still under active development.
