@@ -6,6 +6,13 @@ Now supports SVG path data parsing, such as thes DroidSans font path data and th
 ![](https://cloud.githubusercontent.com/assets/20134338/22331662/91c39c82-e3c4-11e6-8bc6-ee5ad0197ad4.png)
 
 
+
+## Fills
+For simple fills I have included **PolyK** library, just set fill to true on PathContext, but beware default curve settings are very high so this is very slow, so turned off for drawing the font.
+
+![]( https://cloud.githubusercontent.com/assets/20134338/22377303/42bd7e92-e4a9-11e6-8e96-2803da056b56.png )
+
+
 Example WebGL use please see:
 https://github.com/nanjizal/justTrianglesDemo
 
