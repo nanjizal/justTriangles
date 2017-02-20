@@ -65,7 +65,10 @@ class PathContext implements IPathContext {
     var dw: Float;
     var tx: Float;
     var ty: Float;
-    public var id: Int;
+    var minX: Float;
+    var minY: Float;
+    var maxX: Float;
+    var maxY: Float;    public var id: Int;
     public var lineType: LineType = TriangleJoinCurve;
     public function new( id_: Int, width_: Float, ?tx_: Float = 0, ?ty_: Float = 0){
         id = id_;
@@ -73,12 +76,25 @@ class PathContext implements IPathContext {
         s = 1/width_;
         tx = tx_;
         ty = ty_;
+        minX = 1;
+        maxX = -1;
+        minY = 1;
+        maxY = -1;        
         ppp = new Array<Array<Point>>();
         moveTo( dw, dw );
     }
     inline function pt( x: Float, y: Float ): Point {
         // default is between ±1
-        return { x: s*( x - dw + tx ), y: s*( y - dw + ty ) }
+        var x0 = s*( x - dw + tx );
+        var y0 = s*( y - dw + ty );
+        if( x0 < minX ) minX = x0;
+        if( x0 < minY ) minY = y0;
+        if( x0 > maxX ) maxX = x0;
+        if( y0 > maxY ) maxY = y0;
+        return { x: x0, y: y0 }
+    }
+    public function withinBounds( x: Float, y: Float ){
+        return ( x > minX && x < maxX && y > minY && y < maxY );
     }
     public function moveTo( x: Float, y: Float ): Void {
         dirty = true;
