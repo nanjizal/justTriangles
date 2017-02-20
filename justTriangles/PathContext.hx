@@ -307,6 +307,10 @@ class PathContext implements IPathContext {
         dirty = false;
     }
     public function clear(){
+        minX = 1;
+        maxX = -1;
+        minY = 1;
+        maxY = -1;        
         dirty = true;
         ppp_ = null;
         ppp = null;
