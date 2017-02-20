@@ -68,7 +68,8 @@ class PathContext implements IPathContext {
     var minX: Float;
     var minY: Float;
     var maxX: Float;
-    var maxY: Float;    public var id: Int;
+    var maxY: Float;    
+    public var id: Int;
     public var lineType: LineType = TriangleJoinCurve;
     public function new( id_: Int, width_: Float, ?tx_: Float = 0, ?ty_: Float = 0){
         id = id_;
