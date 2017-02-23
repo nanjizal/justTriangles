@@ -33,8 +33,6 @@ new PathContext much improved for drawing outlines.
 - Simple Arc supported
 - Svg path data paths partially supported.
 
-https://github.com/nanjizal/justTrianglesDemo/blob/master/justTrianglesDemo/Demo.hx#L33
-
 MAIN TODO:
 - Debug lines against SVG path data
 - Finish refactor to remove all Point reference ( 80% done see 'No Point' branch ) from classes and check if it's faster to just use x,y.
