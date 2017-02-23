@@ -5,7 +5,9 @@ Now supports SVG path data parsing, such as thes DroidSans font path data and th
 
 ![](https://cloud.githubusercontent.com/assets/20134338/22331662/91c39c82-e3c4-11e6-8bc6-ee5ad0197ad4.png)
 
+[codepen example](http://codepen.io/Nanjizal/pen/JWjGOj)
 
+[codepen of justTriangles mixed with hxSpiro](http://codepen.io/Nanjizal/pen/qReLLR)
 
 ## Fills
 For simple fills I have included **PolyK** library, set fill to true on PathContext, and reduce Curve settings from 0.03 
@@ -20,6 +22,9 @@ Perhaps I need to create two arrays one of paths and one for fills?
 
 Example WebGL use please see:
 https://github.com/nanjizal/justTrianglesDemo
+
+For integration with **Kha** ( g2 ) see:
+https://github.com/nanjizal/justTrianglesKhaG2
 
 new PathContext much improved for drawing outlines.
 - MoveTo and LineTo supported
