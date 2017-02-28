@@ -2,12 +2,12 @@ package justTriangles;
 
 class StoreF6{
     var l: Int = 0;
-    public var s0: Float;
-    public var s1: Float;
-    public var s2: Float;
-    public var s3: Float;
-    public var s4: Float;
-    public var s5: Float;
+    public var s0: Null<Float>;
+    public var s1: Null<Float>;
+    public var s2: Null<Float>;
+    public var s3: Null<Float>;
+    public var s4: Null<Float>;
+    public var s5: Null<Float>;
     public function new(){}
     inline public function clear(){
         l = 0;
@@ -21,7 +21,7 @@ class StoreF6{
     inline public function length(): Int {
         return l;
     }
-    inline public function push( v: Float ){
+    inline public function push( v: Null<Float> ){
         switch( l ){
             case 0:
                 s0 = v;
@@ -41,7 +41,7 @@ class StoreF6{
         l++;
     }
     inline public function pop(){
-        var out: Float = null;
+        var out: Null<Float> = null;
         switch( l ){
             case 0:
                 out = s0;
@@ -68,7 +68,7 @@ class StoreF6{
         return out;
     }
     
-    inline public function unshift( v: Float ){
+    inline public function unshift( v: Null<Float> ){
         s5 = s4;
         s4 = s3;
         s3 = s2;
@@ -76,7 +76,7 @@ class StoreF6{
         s0 = v;
         l++;
     }
-    inline public function shift(): Float{
+    inline public function shift(): Null<Float>{
         var out = s0;
         if( l != 0 ){
             s0 = s1;
@@ -120,7 +120,7 @@ class StoreF6{
         count = 0;
     }
     inline public function next() {
-        var out: Float = null;
+        var out: Null<Float> = null;
         switch( count ){
             case 0:
                 out = s0;
@@ -140,11 +140,11 @@ class StoreF6{
         count++;
         return out;
     }
-    inline public function first(): Float{
+    inline public function first(): Null<Float>{
         return s0;
     }
-    inline public function last(): Float{
-        var out: Float = null;
+    inline public function last(): Null<Float>{
+        var out: Null<Float> = null;
         switch( l ){
             case 0:
                 out = s0;
@@ -163,8 +163,8 @@ class StoreF6{
         }
         return out;
     }
-    inline public function penultimate(): Float{
-        var out: Float = null;
+    inline public function penultimate(): Null<Float>{
+        var out: Null<Float> = null;
         switch( l-1 ){
             case 0:
                 out = s0;
@@ -184,7 +184,7 @@ class StoreF6{
         return out;
     }
     inline public function toArray(){
-        var arr = new Array<Float>();
+        var arr = new Array<Null<Float>>();
         count = 0;
         for( i in this ){
             arr.push( i );
