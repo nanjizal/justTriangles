@@ -61,6 +61,10 @@ class PathContext implements IPathContext {
     var pp: Array<Point>;
     var ppp: Array<Array<Point>>;
     var ppp_: Array<Array<Point>>;
+    var lineColors: Array<Int>;
+    var fillColors: Array<Int>;
+    var lineColor: Int;
+    var fillColor: Int;
     var s: Float;
     var dw: Float;
     var tx: Float;
@@ -80,9 +84,20 @@ class PathContext implements IPathContext {
         minX = 1;
         maxX = -1;
         minY = 1;
-        maxY = -1;        
+        maxY = -1;
+        lineColors = new Array<Int>();
+        fillColors = new Array<Int>();
+        lineColor = Draw.colorId;
+        fillColor = Draw.colorId;
         ppp = new Array<Array<Point>>();
         moveTo( dw, dw );
+    }
+    // only applies after next moveTo command
+    public function setColor( lineColor_: Int, ?fillColor_: Int = -1 ): Void {
+        if( fillColor_ != -1 ){
+            fillColor = fillColor_;
+        }
+        lineColor = lineColor_;
     }
     inline function pt( x: Float, y: Float ): Point {
         // default is between ±1
@@ -100,8 +115,12 @@ class PathContext implements IPathContext {
     public function moveTo( x: Float, y: Float ): Void {
         dirty = true;
         p0 = pt( x, y );
-        if( pp != null ) if( pp.length == 1 ) ppp.pop(); // remove moveTo that don't have another drawing command after.
+        if( pp != null ) if( pp.length == 1 ) {
+            ppp.pop(); // remove moveTo that don't have another drawing command after.
+        }
         pp = new Array();
+        lineColors.push( lineColor );
+        fillColors.push( fillColor );
         pp.push( p0 );
         ppp.push( pp );
     }
@@ -204,14 +223,20 @@ class PathContext implements IPathContext {
     public function fillTriangles(){
         //if( dirty ) reverseEntries();
         var p: Point;
+        var count = 0;
+        var l = ppp_.length;
+        var j: Int;
         for( pp0 in ppp_ ){
+            j = l-count;
             var poly = new Array();
             for( i in 0...pp0.length ){
                 p = pp0[i];
                 poly.push( p.x );
                 poly.push( p.y );
             }
+            Draw.colorId = fillColors[ j ]; 
             polyKFill( poly );
+            count++;
         }
     } 
     
@@ -242,7 +267,7 @@ class PathContext implements IPathContext {
                 b = { x: poly[ i ], y: poly[ i + 1 ] };
                 i = Std.int( tri.c*2 );
                 c = { x: poly[ i ], y: poly[ i + 1 ] };
-                Draw.drawTri( id, false, a,b,c, Draw.colorFill_id );
+                Draw.drawTri( id, false, a,b,c, Draw.colorId );
             }
         }
     }
@@ -250,45 +275,60 @@ class PathContext implements IPathContext {
         Draw.thick = thick;
         if( dirty ) reverseEntries();
         if( fill ) fillTriangles();
+        var count = 0;
+        var l = ppp_.length;
+        var j: Int;
         for( pp0 in ppp_ ){
+            j = l-count;
             switch( lineType ){
                 // Currently best line drawing enum still under active development.
                 case TriangleJoinCurve:
                     var draw = new Draw();
+                    //Draw.colorLine_id = lineColors[ j ];
+                    //Draw.extraLine_id = lineColors[ j ];
+                    Draw.colorId = lineColors[ j ];
                     for( i in 0...pp0.length ){
                        if( i%1 == 0 && i< pp0.length - 1) Draw.triangleJoin( id, draw, pp0[ i ], pp0[ i + 1 ], thick/800, true );
                     }
                 case TriangleJoinStraight:
                     var draw = new Draw();
+                    Draw.colorId = lineColors[ j ];
+                    //Draw.extraFill_id = lineColors[ j ];
                     for( i in 0...pp0.length ){
                        if( i%1 == 0 && i< pp0.length - 1) Draw.triangleJoin( id, draw, pp0[ i ], pp0[ i + 1 ], thick/800, false );
                     }
                 // Other alternates still keeping till have developed ideal solution.
                 case Poly:
                     // fairly optimal but broken
+                    Draw.colorId = lineColors[ j ];
                     Draw.poly( id, outline, pp0 );
                 case Curves:
                     // Not quite working on round rectangle but working well otherwise
                     //Draw.isolatedSpecial( id, pp0[ 0 ], pp0[ 1 ], thick/800 );
+                    Draw.colorId = lineColors[ j ];
                     for( i in 0...pp0.length ) {
                         if( i%1 == 0 && i< pp0.length - 2) Draw.quad( id, outline, pp0, i );
                     }
                 case Round:
                     // Pretty perfect but over drawing
+                    Draw.colorId = lineColors[ j ];
                     for( i in 0...pp0.length ){
                        if( i%1 == 0 && i< pp0.length - 2) Draw.isolatedLine( id, pp0[ i ], pp0[ i + 1 ], thick/800, true );
                     }
                 case Isolated:
                     // similar to poly but more broken
+                    Draw.colorId = lineColors[ j ];
                     for( i in 0...pp0.length ){
                        if( i%1 == 0 && i< pp0.length - 2) Draw.isolatedLine( id, pp0[ i ], pp0[ i + 1 ], thick/800, false );
                     }
                 case Quad:
                     // very broken
+                    Draw.colorId = lineColors[ j ];
                     for( i in 0...pp0.length ) {
                         if( i%1 == 0 && i< pp0.length - 2) Draw.quad( id, outline, pp0, i );
                     }
             }
+            count++;
         }
     }
     inline function reverseEntries(){
@@ -307,10 +347,13 @@ class PathContext implements IPathContext {
         dirty = false;
     }
     public function clear(){
+        lineColors = new Array<Int>();
+        fillColors = new Array<Int>();
+        ppp = new Array<Array<Point>>();
         minX = 1;
         maxX = -1;
         minY = 1;
-        maxY = -1;        
+        maxY = -1;
         dirty = true;
         ppp_ = null;
         ppp = null;
