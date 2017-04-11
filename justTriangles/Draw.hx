@@ -40,10 +40,16 @@ class Draw {
     public static function get_thick(): Float {
         return thickness;
     }
-    public static var colorFill_id: Int;
-    public static var colorLine_id: Int;
-    public static var extraLine_id: Int;
-    public static var extraFill_id: Int;
+    // extraColor is used in debugging and improving code but color mode simplified now to single color.
+    #if extraColor
+        public static var colorFill_id: Int;
+        public static var colorLine_id: Int;
+        public static var extraLine_id: Int;
+        public static var extraFill_id: Int;
+    #else
+        public static var colorId: Int;
+    #end
+    
     public static var drawTri: DrawTri;//Int -> Bool -> Point -> Point -> Point -> Int -> Void;
     public function new(){}
     public static inline var circleSides: Int = 60;
@@ -87,8 +93,13 @@ class Draw {
         thickness = oldThickness;
         var q3 = { x: draw.p3.x, y: draw.p3.y };
         var q4 = { x: draw.p4.x, y: draw.p4.y };
-        drawTri( id, true, q0, q3, q1, colorLine_id );
-        drawTri( id, true, q0, q3, q4, colorLine_id );
+        #if extraColor
+            drawTri( id, true, q0, q3, q1, colorLine_id );
+            drawTri( id, true, q0, q3, q4, colorLine_id );
+        #else 
+            drawTri( id, true, q0, q3, q1, colorId );
+            drawTri( id, true, q0, q3, q4, colorId );
+        #end
         return draw;
     }
     public static inline function endLine( id: Int, p0_: Point, p1_: Point, thick: Float ){
@@ -111,8 +122,13 @@ class Draw {
         thickness = oldThickness;
         var q3 = { x: draw.p3.x, y: draw.p3.y };
         var q4 = { x: draw.p4.x, y: draw.p4.y };
-        drawTri( id, true, q0, q3, q1, colorLine_id );
-        drawTri( id, true, q0, q3, q4, colorLine_id );
+        #if extraColor
+            drawTri( id, true, q0, q3, q1, colorLine_id );
+            drawTri( id, true, q0, q3, q4, colorLine_id );
+        #else
+            drawTri( id, true, q0, q3, q1, colorId);
+            drawTri( id, true, q0, q3, q4, colorId );
+        #end
         return draw;
     }
     public static inline function isolatedLine( id: Int, p0_: Point, p1_: Point, thick: Float, curveEnds: Bool = false ){
@@ -144,8 +160,13 @@ class Draw {
        
         var q3 = { x: draw.p3.x, y: draw.p3.y };
         var q4 = { x: draw.p4.x, y: draw.p4.y };
-        drawTri( id, true, q0, q3, q1, colorFill_id );
-        drawTri( id, true, q0, q3, q4, extraFill_id );
+        #if colorExtra
+            drawTri( id, true, q0, q3, q1, colorFill_id );
+            drawTri( id, true, q0, q3, q4, extraFill_id );
+        #else 
+            drawTri( id, true, q0, q3, q1, colorId );
+            drawTri( id, true, q0, q3, q4, colorId );
+        #end
         return draw;
     }
    
@@ -183,14 +204,27 @@ class Draw {
             } else { /* should be in here, but there are some gaps when using curve so use the next part to fill.*/ }
             // straight line between lines    
             if( clockWise ){
-               drawTri( id, true, draw.p3old2, q1, p0_, extraFill_id );
+                #if extraColor
+                   drawTri( id, true, draw.p3old2, q1, p0_, extraFill_id );
+                #else
+                   drawTri( id, true, draw.p3old2, q1, p0_, colorId );
+                #end
             } else {
-               drawTri( id, true, draw.p4old2, q0, p0_, colorFill_id );
+                #if extraColor
+                   drawTri( id, true, draw.p4old2, q0, p0_, colorFill_id );
+                #else
+                   drawTri( id, true, draw.p4old2, q0, p0_, colorId );
+                #end
             }
             
         }
-        drawTri( id, true, draw.p3old, draw.p3, draw.p4old, colorFill_id );
-        drawTri( id, true, draw.p3old, draw.p3, draw.p4, extraFill_id );
+        #if extraColor
+            drawTri( id, true, draw.p3old, draw.p3, draw.p4old, colorFill_id );
+            drawTri( id, true, draw.p3old, draw.p3, draw.p4, extraFill_id );
+        #else
+            drawTri( id, true, draw.p3old, draw.p3, draw.p4old, colorId );
+            drawTri( id, true, draw.p3old, draw.p3, draw.p4, colorId );
+        #end
         return draw;
     }
    
@@ -341,8 +375,13 @@ class Draw {
         draw.rebuildAsPoly( p[ i + 2 ]);
         var q3 = draw.p3;
         var q4 = draw.p4;
-        drawTri( id, outline, q0, q3, q1, colorFill_id );
-        drawTri( id, outline, q1, q3, q4, extraFill_id );
+        #if extraColor
+            drawTri( id, outline, q0, q3, q1, colorFill_id );
+            drawTri( id, outline, q1, q3, q4, extraFill_id );
+        #else 
+            drawTri( id, outline, q0, q3, q1, colorId );
+            drawTri( id, outline, q1, q3, q4, colorId );
+        #end
         q0 = q3;
         q1 = q4;
         return draw;
@@ -350,14 +389,22 @@ class Draw {
     private static inline function outerFilledTriangles( id: Int, outline: Bool, centre: Point, p: Array<Point>, draw: Draw, i: Int ){
         draw.rebuildAsPoly( p[ i + 2 ]);
         var q3 = draw.p3;
-        drawTri( id, outline, q0, q3, centre, colorLine_id );
+        #if extraColor
+            drawTri( id, outline, q0, q3, centre, colorLine_id );
+        #else 
+            drawTri( id, outline, q0, q3, centre, colorId );
+        #end
         q0 = q3;
         return draw;
     }
     private static inline function outerFilledTrianglesExtra( id: Int, outline: Bool, centre: Point, p: Array<Point>, draw: Draw, i: Int ){
         draw.rebuildAsPoly( p[ i + 2 ]);
         var q3 = draw.p3;
-        drawTri( id, outline, q0, q3, centre, extraLine_id );
+        #if extraColor
+            drawTri( id, outline, q0, q3, centre, extraLine_id );
+        #else
+            drawTri( id, outline, q0, q3, centre, colorId );
+        #end
         q0 = q3;
         return draw;
     }
@@ -366,7 +413,11 @@ class Draw {
     private static inline function innerFilledTriangles( id: Int, outline: Bool, centre: Point, p: Array<Point>, draw: Draw, i: Int ){
         draw.rebuildAsPoly( p[ i + 2 ]);
         var q4 = draw.p4;
-        drawTri( id, outline, q1, q4, centre, colorFill_id );
+        #if extraColor
+            drawTri( id, outline, q1, q4, centre, colorFill_id );
+        #else
+            drawTri( id, outline, q1, q4, centre, colorId );
+        #end
         q1 = q4;
         return draw;
     }
@@ -376,8 +427,13 @@ class Draw {
         var q3 = draw.p3;
         var q4 = draw.p4;
         if( i != 0 ){
-            drawTri( id, outline, q0, q3, q1, colorFill_id );
-            drawTri( id, outline, q1, q3, q4, extraFill_id );
+            #if extraColor
+                drawTri( id, outline, q0, q3, q1, colorFill_id );
+                drawTri( id, outline, q1, q3, q4, extraFill_id );
+            #else 
+                drawTri( id, outline, q0, q3, q1, colorId );
+                drawTri( id, outline, q1, q3, q4, colorId );
+            #end
         }
         q0 = q3;
         q1 = q4;
