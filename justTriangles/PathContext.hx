@@ -61,6 +61,8 @@ class PathContext implements IPathContext {
     var pp: Array<Point>;
     var ppp: Array<Array<Point>>;
     var ppp_: Array<Array<Point>>;
+    var thick: Float;
+    var thicks: Array<Float>;
     var lineColors: Array<Int>;
     var fillColors: Array<Int>;
     var lineColor: Int;
@@ -85,10 +87,13 @@ class PathContext implements IPathContext {
         maxX = -1;
         minY = 1;
         maxY = -1;
+        thick
         lineColors = new Array<Int>();
         fillColors = new Array<Int>();
+        thicks = new Array<Float>();
         lineColor = Draw.colorId;
         fillColor = Draw.colorId;
+        thick = Draw.thick;
         ppp = new Array<Array<Point>>();
         moveTo( dw, dw );
     }
@@ -98,6 +103,9 @@ class PathContext implements IPathContext {
             fillColor = fillColor_;
         }
         lineColor = lineColor_;
+    }
+    public function setThickness( thick_: Float ): Float {
+        thick = thick_;
     }
     inline function pt( x: Float, y: Float ): Point {
         // default is between ±1
@@ -119,10 +127,13 @@ class PathContext implements IPathContext {
             ppp.pop(); // remove moveTo that don't have another drawing command after.
             lineColors.pop();
             fillColors.pop();
+            thicks.pop();
         }
         pp = new Array();
-        lineColors[ ppp.length ] =  lineColor;
-        fillColors[ ppp.length ] = fillColor;
+        var pl = ppp.length;
+        lineColors[ pl ] =  lineColor;
+        fillColors[ pl ] = fillColor;
+        thicks[ pl ] = thick;
         pp.push( p0 );
         ppp.push( pp );
         
@@ -134,10 +145,13 @@ class PathContext implements IPathContext {
             ppp.pop(); // remove moveTo that don't have another drawing command after.
             lineColors.pop();
             fillColors.pop();
+            thicks.pop();
         }
         pp = new Array();
+        var pl = ppp.length;
         lineColors[ ppp.length ] = lineColor;
         fillColors[ ppp.length ] = fillColor;
+        thicks[ pl ] = thick;
         pp.push( p0 );
         ppp.push( pp );
         
@@ -280,8 +294,9 @@ class PathContext implements IPathContext {
             }
         }
     }
-    public function render( thick: Float, ?outline: Bool = true ){
-        Draw.thick = thick;
+    public function render( thick_: Float, ?outline: Bool = true ){
+        // thick_ not used?
+        //Draw.thick = thick;
         if( dirty ) reverseEntries();
         if( fill ) fillTriangles();
         var j = 0;
@@ -293,12 +308,14 @@ class PathContext implements IPathContext {
                     
                     var draw = new Draw();
                     Draw.colorId = lineColors[ j ];
+                    Draw.thick = thicks[ j ];
                     for( i in 0...pp0.length ){
                        if( i%1 == 0 && i< pp0.length - 1) Draw.triangleJoin( id, draw, pp0[ i ], pp0[ i + 1 ], thick/800, true );
                     }
                 case TriangleJoinStraight:
                     var draw = new Draw();
                     Draw.colorId = lineColors[ j ];
+                    Draw.thick = thicks[ j ];
                     for( i in 0...pp0.length ){
                        if( i%1 == 0 && i< pp0.length - 1) Draw.triangleJoin( id, draw, pp0[ i ], pp0[ i + 1 ], thick/800, false );
                     }
@@ -354,6 +371,7 @@ class PathContext implements IPathContext {
     public function clear(){
         lineColors = new Array<Int>();
         fillColors = new Array<Int>();
+        thicks = new Array<Float>();
         ppp = new Array<Array<Point>>();
         minX = 1;
         maxX = -1;
