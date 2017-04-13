@@ -46,12 +46,12 @@ class ShapePoints {
         var angle: Float = 0;
         var angleInc: Float = ( Math.PI*2 )/sides;
         var offset: Float = rotation - Math.PI/2;
-        for( i in 0...( sides + 3 ) ){
+        var tot = sides + 3;
+        for( i in 0...tot ){
             angle = i*angleInc;
             angle = angle + offset; // ?  to test!
-            p.push( { x: d.x + radius * Math.cos( angle ), y: d.y + radius * Math.sin( angle ) });
-        } 
-        //p.reverse();
+            p[ tot - i - 1 ] = { x: d.x + radius * Math.cos( angle ), y: d.y + radius * Math.sin( angle ) }
+        }
         return p;
     }
     // Create Polygon Points
