@@ -87,7 +87,6 @@ class PathContext implements IPathContext {
         maxX = -1;
         minY = 1;
         maxY = -1;
-        thick
         lineColors = new Array<Int>();
         fillColors = new Array<Int>();
         thicks = new Array<Float>();
