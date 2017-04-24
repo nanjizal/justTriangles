@@ -13,8 +13,8 @@ class SevenSeg{
     public var gap: Float;
     
     // example use, for simple LED type number display.
-    // var sevenSeg = new SevenSeg( 1, 1, 0, 0, 0.200, 0.320 );
-    // sevenSeg.createHex( 8 );
+    // var sevenSeg = new SevenSeg( 1, 1, 0.200, 0.320 );
+    // sevenSeg.createHex( 8, 0, 0 );
     //
     public function new( id_: Int, colorID_: Int
                         ,  width_: Float, height_: Float ){
