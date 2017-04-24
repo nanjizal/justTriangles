@@ -17,19 +17,18 @@ class SevenSeg{
     // sevenSeg.createHex( 8 );
     //
     public function new( id_: Int, colorID_: Int
-                        , x_: Float, y_: Float
                         ,  width_: Float, height_: Float ){
         id = id_;
         colorID = colorID_;
-        x = x_;
-        y = y_;
         height = height_;
         width  = width_;
         unit = width_ * (1/10);
         gap = unit/5;
     } 
     
-    public function createHex( hexCode: Int ){
+    public function add( hexCode: Int, x_: Float, y_: Float ){
+        x = x_;
+        y = y_;
         switch( hexCode ){
             case 0:
                 a();
