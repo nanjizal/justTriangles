@@ -12,6 +12,7 @@ class SevenSeg{
     public var y: Float;
     public var gap: Float;
     public var spacing: Float;
+    public var triangles: Array<Triangle>;
     // example use, for simple LED type number display.
     // var sevenSeg = new justTriangles.SevenSeg( 1, 1, 0.050, 0.080 );
     // sevenSeg.addDigit( 0, 0, 0 );
@@ -27,6 +28,7 @@ class SevenSeg{
         unit = width_ * (1/10);
         gap = unit/5;
         spacing = width + unit*1.5;
+        triangles = new Array<Triangle>();
     } 
     
     public inline function numberWidth( val: Int ): Float {
@@ -192,7 +194,7 @@ class SevenSeg{
         // not implemented
     }
     inline function horiSeg( x_, y_ ){
-        var tri = Triangle.triangles;
+        var tri = triangles;
         var l = tri.length;
         tri[ l ] = new Triangle( id
                         , outline
@@ -227,7 +229,7 @@ class SevenSeg{
                         , colorID );
     }
     inline function vertSeg( x_, y_ ){
-        var tri = Triangle.triangles;
+        var tri = triangles;
         var l = tri.length;
         var hi = height/2;
         tri[ l ] = new Triangle( id
@@ -261,5 +263,17 @@ class SevenSeg{
                         , { x: x_ + 2*unit, y: y_ + hi - unit }
                         , 0
                         , colorID );
+    }
+    public inline function render(){
+        var tri = triangles;
+        var l = tri.length;
+        var l2 = Triangle.triangles.length;
+        for( i in 0...l ) Triangle.triangles[l2+i] = tri[i];
+    }
+    public inline function clear(){
+        /*var tri = triangles;
+        var l = tri.length;
+        for( i in 0...l ) triangles[i] = null;*/
+        triangles = new Array<Triangle>();
     }
 }
