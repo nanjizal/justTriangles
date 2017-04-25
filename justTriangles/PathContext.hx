@@ -107,7 +107,7 @@ class PathContext implements IPathContext {
         thick = thick_;
         return thick;
     }
-    inline function pt( x: Float, y: Float ): Point {
+    public inline function pt( x: Float, y: Float ): Point {
         // default is between ±1
         var x0 = s*( x - dw + tx );
         var y0 = s*( y - dw + ty );
