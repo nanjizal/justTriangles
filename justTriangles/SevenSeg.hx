@@ -11,10 +11,12 @@ class SevenSeg{
     public var x: Float;
     public var y: Float;
     public var gap: Float;
-    
+    public var spacing: Float;
     // example use, for simple LED type number display.
-    // var sevenSeg = new SevenSeg( 1, 1, 0.200, 0.320 );
-    // sevenSeg.add( 8, 0, 0 );
+    // var sevenSeg = new justTriangles.SevenSeg( 1, 1, 0.050, 0.080 );
+    // sevenSeg.addDigit( 0, 0, 0 );
+    // sevenSeg.addNumber( 123456780, 0, 0 );
+    // sevenSeg.addString( '0123456789', -0.5, -0.5 );
     //
     public function new( id_: Int, colorID_: Int
                         ,  width_: Float, height_: Float ){
@@ -24,9 +26,44 @@ class SevenSeg{
         width  = width_;
         unit = width_ * (1/10);
         gap = unit/5;
+        spacing = width + unit*1.5;
     } 
     
-    public function add( hexCode: Int, x_: Float, y_: Float ){
+    public inline function numberWidth( val: Int ): Float {
+        var str = Std.string( val );
+        return stringWidth( str );
+    }
+    public inline function stringWidth( str: String ): Float {
+        var l = str.length;
+        var space = 0.;
+        for( i in 0...l ){
+            space += spacing;
+        }
+        return space;
+    }
+    public inline function addNumber( val: Int, x_: Float, y_: Float, ?centre: Bool = false ){
+        var str = Std.string( val );
+        addString( str, x_, y_, centre );
+    }
+    public inline function addString( str: String, x_: Float, y_: Float, ?centre: Bool = false ){
+        var l = str.length;
+        var space = 0.;
+        if( centre ){
+            for( i in 0...l ){
+                space += spacing;
+            }
+            space -= unit*1.5;// centreX makes assumption for simplicity see spacing in constructor.
+            space = -space/2;
+            y_ = y_ - height/2;
+        }
+        for( i in 0...l ){
+            trace( str.substr( i, 1 ) );
+            addDigit( Std.parseInt( str.substr( i, 1 ) ), x_ + space, y_ );
+            space += spacing;
+        }
+    }
+    
+    public inline function addDigit( hexCode: Int, x_: Float, y_: Float ){
         x = x_;
         y = y_;
         switch( hexCode ){
@@ -44,7 +81,7 @@ class SevenSeg{
                 a();
                 b();
                 g();
-                c();
+                e();
                 d();
             case 3:
                 a();
