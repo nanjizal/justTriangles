@@ -59,7 +59,6 @@ class SevenSeg{
             y_ = y_ - height/2;
         }
         for( i in 0...l ){
-            trace( str.substr( i, 1 ) );
             addDigit( Std.parseInt( str.substr( i, 1 ) ), x_ + space, y_ );
             space += spacing;
         }
@@ -97,7 +96,6 @@ class SevenSeg{
                 b();
                 c();
             case 5:
-            trace( '5 ');
                 a();
                 f();
                 g();
