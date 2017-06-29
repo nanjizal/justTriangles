@@ -105,4 +105,44 @@ class Triangle {
     function sign( n: Float ): Int {
         return Std.int( Math.abs( n )/n );
     }
+    // no bounds checking
+    inline function liteHit( px: Float, py: Float ): Bool {
+        var planeAB = ( ax - px )*( by - py ) - ( bx - px )*( ay - py );
+        var planeBC = ( bx - px )*( cy - py ) - ( cx - px )*( by - py );
+        var planeCA = ( cx - px )*( ay - py ) - ( ax - px )*( cy - py );
+        return sign( planeAB ) == sign( planeBC ) && sign( planeBC ) == sign( planeCA );
+    }
+    // draws Triangle with horizontal strips 1px high.
+    public function drawStrips( drawRect: Float->Float->Float->Float->Void ){
+        var xi: Int         = Math.floor( x );
+        var yi: Int         = Math.floor( y );
+        var righti: Int     = Math.ceil( right );
+        var bottomi: Int    = Math.ceil( bottom );
+        var sx: Int = 0;
+        var ex: Int = 0;
+        var sFound: Bool;
+        var eFound: Bool;
+        // need to adjust for negative values thought required.
+        for( y0 in yi...bottomi ){ // loop vertically
+            sFound = false; // could remove if swapped floor and ceil on boundaries?
+            eFound = false; // not needed perhaps just for safety at mo.
+            for( x0 in xi...righti ){
+                if( liteHit( x0, y0 ) ) { // start strip
+                    sx = x0;
+                    sFound = true;
+                    break;
+                }
+            }
+            if( sFound ){
+                for( x0 in sx...righti ){ // end strip
+                    if( !liteHit( x0, y0 ) ){
+                        ex = x0;
+                        eFound = true;
+                        break;
+                    }
+                }
+                if( eFound ) drawRect( sx, y0, ex - sx, 1 );
+            }
+        }
+    }
 }
